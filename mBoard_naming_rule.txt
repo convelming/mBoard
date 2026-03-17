@@ -1,0 +1,53 @@
+mBoard 命名规则（简化版）
+
+1) 型号格式
+MB-[L][G][O][C][S][P][R]-[YYMM]-[NNNNNN]
+
+2) 字段定义（单字符）
+- L: 产品线
+  B = BASE
+  P = PRO
+  M = MAX
+
+- G: 代际 硬件世代/版本代号
+  1 = G1
+  2 = G2
+  3 = G3 ...
+
+- O: 产地代码（自定义）
+  S = Shenzhen
+  H = Hangzhou
+  C = Chengdu
+  (可按工厂统一映射)
+
+- C: 棋种
+  C = 国际象棋 (Chess)
+  X = 中国象棋 (Xiangqi)
+
+- S: 传感方案
+  C = coreXY
+  V = vehicle
+
+- P: 芯片版本（1位）
+  E = ESP32 S3
+
+- R保留位 00
+  0
+  0
+
+- YYMM: 生产年月
+  例如 2603 = 2026年03月
+
+- NNNNNN: 流水号（4位）
+  000001 ~ 999999
+
+3) 示例
+- MB-P1SCNEA-2603-0123
+  含义: PRO, G1, 深圳, 国际象棋, NFC, ESP32, Arduino, 2026-03, 流水0123
+
+- MB-L2CVHEA-2608-0042
+  含义: LITE, G2, 成都, 中国象棋, Hall, ESP32, Arduino, 2026-08, 流水0042
+
+4) 版本管理建议
+- 软件版本不要放进设备型号，单独记录：
+  FW (固件版本)、WEB (网页版本)、API (接口版本)
