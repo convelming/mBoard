@@ -1,0 +1,2 @@
+username,salt,password_hash,active,created_at
+admin,58dd1f445f934e8a69576143b035e568,8ac8fc8a1d4aa1ba44fad0b7bba0540eb404d4c5952622b794efaabaf17db77e,1,2026-03-18T00:00:00Z

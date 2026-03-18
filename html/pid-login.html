@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mTabula | PID 登录</title>
+  <meta name="description" content="PID 管理页面登录" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./pid-login.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">mTabula <span>PID Admin</span></div>
+    <nav>
+      <a href="./index.html">产品首页</a>
+      <a href="./gamespace.html">游戏空间</a>
+      <a href="./contact.html">联系我们</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="card login-card">
+      <h1>PID 管理登录</h1>
+      <p class="muted">请输入管理员账号密码后进入 Product ID 录入页面。</p>
+      <form id="loginForm">
+        <label>用户名
+          <input id="username" name="username" autocomplete="username" required />
+        </label>
+        <label>密码
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <div class="actions">
+          <button type="submit">登录</button>
+          <a class="ghost-link" href="./index.html">返回首页</a>
+        </div>
+      </form>
+      <p id="statusLine" class="muted"></p>
+    </section>
+  </main>
+  <script src="./pid-login.js"></script>
+</body>
+</html>

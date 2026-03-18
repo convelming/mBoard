@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mTabula | PID 管理</title>
+  <meta name="description" content="按 mBoard 命名规则录入 Product ID，生成棋盘访问路径二维码。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./pid.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">mTabula <span>PID Admin</span></div>
+    <nav>
+      <a href="./index.html">产品首页</a>
+      <a href="./gamespace.html">游戏空间</a>
+      <a href="./contact.html">联系我们</a>
+      <a href="#" id="logoutLink">退出</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="card intro">
+      <h1>Product ID 录入</h1>
+      <p>命名规则：<code>MB + 型号 + 代际 + 产地 + C/V + N/H + 芯片 + 软件 + 年月 + 保留位 + 流水</code></p>
+      <p class="muted">示例：<code>MBP1SCNEA26030001</code></p>
+    </section>
+
+    <section class="card form-card">
+      <form id="enrollForm" class="form-grid">
+        <label>型号
+          <select name="tierCode" id="tierCode">
+            <option value="B">Basic (B)</option>
+            <option value="P" selected>Pro (P)</option>
+            <option value="L">Lite (L)</option>
+          </select>
+        </label>
+
+        <label>代际
+          <input name="generation" id="generation" maxlength="1" value="1" required />
+        </label>
+
+        <label>产地代码
+          <input name="originCode" id="originCode" maxlength="1" value="S" required />
+        </label>
+
+        <label>棋种标识
+          <select name="gameCode" id="gameCode">
+            <option value="C" selected>国际象棋 (C)</option>
+            <option value="V">中国象棋 (V)</option>
+          </select>
+        </label>
+
+        <label>感应方案
+          <select name="sensorCode" id="sensorCode">
+            <option value="N" selected>NFC (N)</option>
+            <option value="H">Hall (H)</option>
+          </select>
+        </label>
+
+        <label>芯片版本
+          <select name="chipCode" id="chipCode">
+            <option value="E" selected>ESP32 (E)</option>
+            <option value="A">Arduino (A)</option>
+            <option value="S">STM (S)</option>
+          </select>
+        </label>
+
+        <label>软件版本
+          <input name="swCode" id="swCode" maxlength="1" value="A" required />
+        </label>
+
+        <label>生产年月
+          <input type="month" name="productionMonth" id="productionMonth" required />
+        </label>
+
+        <label>保留位
+          <input name="reserved" id="reserved" value="00" maxlength="2" required />
+        </label>
+
+        <label>流水号 (00-99)
+          <input name="serial" id="serial" value="01" maxlength="2" required />
+        </label>
+
+        <label>显示型号
+          <input name="model" id="model" value="mBoard-pro" required />
+        </label>
+
+        <label class="checkbox-line">启用
+          <input type="checkbox" name="active" id="active" checked />
+        </label>
+
+        <label class="full">Product ID
+          <input name="productId" id="productId" readonly />
+        </label>
+
+        <div class="actions full">
+          <button type="submit">写入并生成二维码</button>
+          <button type="button" id="copyBtn" class="ghost">复制 Product ID</button>
+        </div>
+      </form>
+      <p id="statusLine" class="muted"></p>
+    </section>
+
+    <section class="card result" id="resultCard">
+      <h2>录入结果</h2>
+      <div class="result-grid">
+        <div>
+          <p><span>Product ID:</span> <strong id="resultProductId">-</strong></p>
+          <p><span>访问路径:</span> <code id="resultPath">-</code></p>
+          <p><span>访问URL:</span> <a id="resultUrl" target="_blank" rel="noopener">-</a></p>
+          <p><span>数据目录:</span> <code id="resultWorkspace">-</code></p>
+        </div>
+        <div class="qr-wrap">
+          <img id="qrImage" alt="二维码" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./pid.js"></script>
+</body>
+</html>

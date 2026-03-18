@@ -1,0 +1,4 @@
+product_id,model,active,tier_code,tier_name,generation,origin_code,game_code,sensor_code,chip_code,sw_code,yy,mm,reserved,serial,created_at
+MBP1SCNEA26030001,mBoard-pro-demo,1,,,,,,,,,,,,,
+MBL2CVHEA26080042,mBoard-lite-demo,1,,,,,,,,,,,,,
+MBB1SCNEA26030001,mBoard-basic,1,B,basic,1,S,C,N,E,A,26,03,00,01,2026-03-18T09:05:13.362569+00:00

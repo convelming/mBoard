@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mTabula | 自动对弈智能棋盘</title>
+  <meta name="description" content="mTabula：自动移动棋子、扫码即连、支持远程人机/人人对弈，扩展 RPG 与互动故事的智能棋盘。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <canvas id="bg3d" aria-hidden="true"></canvas>
+  <div class="bg-overlay"></div>
+
+  <header class="site-header">
+    <div class="brand">mTabula <span>PRO</span></div>
+    <nav>
+      <a href="#product">产品简介</a>
+      <a href="#modes">玩法模式</a>
+      <a href="#tech">核心技术</a>
+      <a href="./gamespace.html">游戏空间</a>
+      <a href="./contact.html">联系我们</a>
+    </nav>
+    <a class="head-cta" href="./gamespace.html">进入游戏空间</a>
+  </header>
+
+  <main>
+    <section class="hero reveal" id="product">
+      <div class="hero-copy">
+        <p class="eyebrow">AUTONOMOUS BOARD EXPERIENCE</p>
+        <h1>棋盘不再只是棋盘<br/>它是联网互动终端</h1>
+        <p>
+          mTabula 采用 CoreXY + 电磁驱动，在实体棋盘上自动搬运棋子。
+          用户通过扫码进入网页房间，和坐在棋盘旁的玩家实时对弈。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./gamespace.html">开始体验</a>
+          <a class="btn ghost" href="#tech">查看技术方案</a>
+        </div>
+        <div class="hero-metrics">
+          <div><strong>扫码即连</strong><span>每块棋盘独立 ID 会话</span></div>
+          <div><strong>实时同步</strong><span>网页、后端、ESP32 三端联动</span></div>
+          <div><strong>多内容扩展</strong><span>对弈 / RPG / 历史故事</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="board-mock">
+          <div class="mock-title">mTabula Smart Board</div>
+          <div class="mock-grid"></div>
+          <div class="mock-orb a"></div>
+          <div class="mock-orb b"></div>
+          <div class="mock-orb c"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal" id="modes">
+      <h2>玩法模式</h2>
+      <div class="steps">
+        <article>
+          <span>01</span>
+          <h3>棋盘游戏</h3>
+          <p>国际象棋/中国象棋界面切换，拖拽走子后同步到后端与 ESP32 棋盘执行。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>RPG 场景</h3>
+          <p>复用棋盘作为互动地图与道具载体，可接入大富翁、桌游剧本等逻辑。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>历史故事</h3>
+          <p>通过定制地图和人偶，在棋盘上演绎三国、童话或教育内容剧情。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section reveal" id="tech">
+      <h2>核心技术架构</h2>
+      <div class="spec-grid">
+        <div class="spec-card">
+          <h3>运动控制层</h3>
+          <ul>
+            <li>CoreXY 机构 + 电磁拖动</li>
+            <li>棋盘侧霍尔传感反馈走子</li>
+            <li>校准接口支持原点/比例修正</li>
+            <li>可扩展限位与异常检测</li>
+          </ul>
+        </div>
+        <div class="spec-card">
+          <h3>设备通信层</h3>
+          <ul>
+            <li>ESP32-S3 固件（Arduino IDE）</li>
+            <li>REST/WebSocket 指令通道</li>
+            <li>设备 ID 与二维码房间绑定</li>
+            <li>状态上报与故障可追踪</li>
+          </ul>
+        </div>
+        <div class="spec-card">
+          <h3>云端与应用层</h3>
+          <ul>
+            <li>网页端实时对弈控制</li>
+            <li>FEN/日志历史分析</li>
+            <li>多棋盘统一运营后台</li>
+            <li>开放内容脚本与二次开发</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal quote">
+      <p>“像 Square Off 一样顺滑的自动走子体验，但可扩展成完整的棋盘交互平台。”</p>
+    </section>
+
+    <section class="section reveal contact">
+      <h2>下一步</h2>
+      <p>先进入游戏空间体验联机流程，再到联系我们页面查看团队与招聘信息模板。</p>
+      <div class="contact-bar">
+        <div><span>游戏空间</span><strong><a href="./gamespace.html">gamespace.html</a></strong></div>
+        <div><span>联系我们</span><strong><a href="./contact.html">contact.html</a></strong></div>
+        <div><span>演示建议</span><strong>二维码 + 一块实物棋盘联调</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 mTabula Lab · Smart Connected Board Platform.
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>

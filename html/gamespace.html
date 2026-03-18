@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mTabula | 游戏空间</title>
+  <meta name="description" content="mTabula 游戏空间：扫码进入、拖拽走子、记录历史、配置棋盘。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/chessboard-1.0.0.css" />
+  <link rel="stylesheet" href="./gamespace.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">mTabula <span>GameSpace</span></div>
+    <nav>
+      <a href="./index.html">产品首页</a>
+      <a href="./contact.html">联系我们</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="card session-card" id="sessionCard">
+      <div class="session-meta">
+        <p class="eyebrow">BOARD SESSION</p>
+        <h1>游戏空间</h1>
+        <p>用户名（棋盘 ID）：<strong id="boardIdLabel"></strong></p>
+        <p class="muted">扫码校验在棋盘端执行，网页端不展示二维码。</p>
+        <p class="muted" id="connectStatus">后端连接状态：检测中...</p>
+      </div>
+    </section>
+
+    <section class="card tabs-card" id="tabsCard">
+      <div class="tablist" role="tablist" aria-label="Game Space Tabs">
+        <button class="tab active" data-tab="board">棋盘游戏</button>
+        <button class="tab" data-tab="history">游玩历史</button>
+        <button class="tab" data-tab="rpg">RPG游戏</button>
+        <button class="tab" data-tab="story">历史故事</button>
+        <button class="tab" data-tab="config">棋盘配置</button>
+      </div>
+
+      <div class="tab-panel active" data-panel="board">
+        <div class="toolbar">
+          <label>
+            棋盘类型
+            <select id="boardTypeSelect">
+              <option value="chess">国际象棋</option>
+              <option value="xiangqi">中国象棋</option>
+            </select>
+          </label>
+          <label>
+            我的阵营
+            <select id="sideSelect">
+              <option value="white">白方</option>
+              <option value="black">黑方</option>
+            </select>
+          </label>
+          <button id="joinBtn">加入对弈</button>
+          <button id="resetBtn" class="ghost">重置棋盘</button>
+          <button id="simulateSensorBtn" class="ghost">模拟棋盘端走子</button>
+        </div>
+
+        <div class="game-grid">
+          <div class="board-stage">
+            <div id="chessBoard" class="board-surface"></div>
+            <div id="xiangqiBoard" class="board-surface xq-board hidden" aria-label="中国象棋棋盘"></div>
+            <section id="chessMetaPanel" class="chess-meta">
+              <div class="meta-item"><span>Status</span><div id="chessStatus">-</div></div>
+              <div class="meta-item"><span>FEN</span><div id="chessFen">-</div></div>
+              <div class="meta-item"><span>PGN</span><div id="chessPgn">-</div></div>
+              <canvas id="chessStateCanvas" width="960" height="88" aria-label="国际象棋状态画布"></canvas>
+            </section>
+          </div>
+          <aside class="side-log">
+            <h3>实时动作日志</h3>
+            <div id="moveLog" class="log-list"></div>
+            <p class="muted">前端走子会写入后端接口占位，并预留 ESP32 回传入口。</p>
+          </aside>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="history">
+        <h2>游玩历史</h2>
+        <p class="muted">记录所有棋盘的 move / FEN 日志，可用于复盘与数据分析。</p>
+        <div class="history-actions">
+          <button id="refreshHistoryBtn" class="ghost">刷新历史</button>
+          <button id="clearLocalHistoryBtn" class="ghost">清空本地缓存</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>棋盘ID</th>
+                <th>类型</th>
+                <th>来源</th>
+                <th>Move</th>
+                <th>FEN/状态</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="rpg">
+        <h2>RPG游戏</h2>
+        <p class="muted">棋盘可作为场景底板，后续接入大富翁、狼人杀等剧情和状态机。</p>
+        <div class="cards">
+          <article>
+            <h3>剧本入口</h3>
+            <p>按棋盘 ID 绑定剧本版本，玩家进入房间后自动加载任务节点。</p>
+          </article>
+          <article>
+            <h3>事件触发</h3>
+            <p>棋子或人偶到达目标格后触发事件，推送到网页端与设备端联动。</p>
+          </article>
+          <article>
+            <h3>道具系统</h3>
+            <p>结合 NFC 标签或二维码道具，扩展角色属性与互动规则。</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="story">
+        <h2>历史故事</h2>
+        <p class="muted">在棋盘上铺设地图贴面，通过移动定制角色讲述故事并实时交互。</p>
+        <div class="cards">
+          <article>
+            <h3>三国场景</h3>
+            <p>城池格位触发历史事件，人物移动可引导教学叙事。</p>
+          </article>
+          <article>
+            <h3>童话场景</h3>
+            <p>白雪公主等故事可通过任务线与机关点做沉浸式体验。</p>
+          </article>
+          <article>
+            <h3>教育场景</h3>
+            <p>把时间线、地理点位做成实体互动课程，提升课堂参与感。</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="config">
+        <h2>棋盘配置</h2>
+        <p class="muted">用于校正 CoreXY 位移比例、原点偏移和运行参数。</p>
+        <form id="configForm" class="config-form">
+          <label>步距比例 X(mm/step)
+            <input type="number" step="0.001" name="scaleX" required />
+          </label>
+          <label>步距比例 Y(mm/step)
+            <input type="number" step="0.001" name="scaleY" required />
+          </label>
+          <label>原点偏移 X(mm)
+            <input type="number" step="0.1" name="offsetX" required />
+          </label>
+          <label>原点偏移 Y(mm)
+            <input type="number" step="0.1" name="offsetY" required />
+          </label>
+          <label>电磁吸力等级(1-10)
+            <input type="number" min="1" max="10" name="magnetLevel" required />
+          </label>
+          <div class="config-actions">
+            <button type="submit">保存配置</button>
+            <button type="button" id="homeBtn" class="ghost">回零测试</button>
+          </div>
+        </form>
+        <p id="configStatus" class="muted"></p>
+      </div>
+    </section>
+
+    <section class="card auth-fail hidden" id="authFailCard">
+      <h2>请先扫码进入</h2>
+      <p>当前产品未授权或未识别到有效 Product ID。</p>
+      <p>请使用手机扫描棋盘上的二维码进入对应房间。</p>
+    </section>
+  </main>
+
+  <script src="./js/jquery-3.7.1.min.js"></script>
+  <script src="./js/chess.js"></script>
+  <script src="./js/chessboard-1.0.0.js"></script>
+  <script src="./gamespace.js"></script>
+</body>
+</html>

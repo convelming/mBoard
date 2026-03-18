@@ -1,0 +1,420 @@
+:root {
+  --bg: #0b0f16;
+  --bg2: #111826;
+  --card: rgba(17, 24, 38, 0.82);
+  --line: rgba(255, 255, 255, 0.14);
+  --text: #eef3ff;
+  --muted: #9fb1cf;
+  --accent: #ff7a45;
+  --accent2: #28d3b4;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 8% 8%, #1f3150 0%, transparent 35%),
+    radial-gradient(circle at 90% 90%, #2a1f3d 0%, transparent 32%),
+    var(--bg);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.brand span {
+  color: var(--accent2);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+nav {
+  display: flex;
+  gap: 14px;
+}
+
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+nav a:hover {
+  opacity: 1;
+}
+
+.shell {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.auth-fail {
+  text-align: center;
+  padding: 28px 18px;
+}
+
+.auth-fail h2 {
+  margin: 0 0 10px;
+}
+
+.auth-fail p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+.session-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 18px;
+}
+
+.session-meta h1 {
+  margin: 6px 0 8px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent2);
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tabs-card {
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.tab {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 9px 13px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, var(--accent), #ff985c);
+  border-color: transparent;
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+  padding-top: 14px;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #cfdbef;
+}
+
+select,
+input,
+button {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  padding: 9px 11px;
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), #ff9659);
+  color: #fff;
+  border: 0;
+}
+
+button.ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+}
+
+.board-stage {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.board-surface {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.chess-meta {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.meta-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+}
+
+.meta-item span {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.meta-item div {
+  word-break: break-all;
+}
+
+#chessStateCanvas {
+  width: 100%;
+  max-width: 760px;
+  height: 88px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#chessBoard {
+  aspect-ratio: 1 / 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.xq-board {
+  aspect-ratio: 9 / 10;
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  border: 2px solid rgba(197, 157, 101, 0.8);
+  background: #f0d5a6;
+  max-width: 700px;
+}
+
+.xq-cell {
+  border: 1px solid rgba(79, 49, 22, 0.24);
+  display: grid;
+  place-items: center;
+  position: relative;
+  min-height: 48px;
+}
+
+.xq-cell.river {
+  background: rgba(106, 163, 201, 0.22);
+}
+
+.xq-piece {
+  width: 74%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid rgba(66, 40, 18, 0.65);
+  background: #fdf2d3;
+  display: grid;
+  place-items: center;
+  font-size: clamp(14px, 1.9vw, 22px);
+  font-weight: 700;
+  cursor: grab;
+  user-select: none;
+}
+
+.xq-piece.red {
+  color: #b30e0e;
+}
+
+.xq-piece.black {
+  color: #1d2332;
+}
+
+.xq-cell.over {
+  outline: 2px dashed rgba(255, 122, 69, 0.7);
+  outline-offset: -3px;
+}
+
+.side-log {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.side-log h3 {
+  margin-top: 0;
+}
+
+.log-list {
+  max-height: 480px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.log-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+}
+
+.log-item .meta {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cards article {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cards h3 {
+  margin-top: 0;
+}
+
+.config-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 720px;
+}
+
+.config-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.warn {
+  color: var(--warn);
+}
+
+@media (max-width: 980px) {
+  .session-card,
+  .game-grid,
+  .cards,
+  .config-form {
+    grid-template-columns: 1fr;
+  }
+
+  .shell {
+    padding: 14px;
+  }
+
+  .site-header {
+    padding: 12px 14px;
+  }
+
+  nav {
+    display: none;
+  }
+}
