@@ -1,0 +1,97 @@
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #1d2433;
+  --muted: #61708a;
+  --line: #dce3ef;
+  --accent: #1570ef;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  color: var(--text);
+  background: linear-gradient(145deg, #eef3ff 0%, #f8fafc 60%, #ecfff8 100%);
+}
+.wrap { max-width: 1020px; margin: 0 auto; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+h1,h2,h3 { margin: 0 0 10px; }
+.muted { color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+input, select, button {
+  border: 1px solid #cfd9e6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+button {
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+button.ghost {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid #cfd9e6;
+}
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.online { background: #dcfce7; color: #166534; }
+.offline { background: #fee2e2; color: #991b1b; }
+.board-wrap {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 12px;
+}
+.board {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  border: 1px solid var(--line);
+}
+.cell {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  user-select: none;
+}
+.piece { font-size: clamp(14px, 2vw, 22px); }
+.hist {
+  max-height: 480px;
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(0,0,0,0.35);
+  padding: 20px;
+}
+.modal.show { display: grid; }
+.modal-card {
+  width: min(500px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #dce3ef;
+  padding: 16px;
+}
+@media (max-width: 860px) {
+  .board-wrap { grid-template-columns: 1fr; }
+}

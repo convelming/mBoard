@@ -1,4 +1,2 @@
-product_id,model,active,tier_code,tier_name,generation,origin_code,game_code,sensor_code,chip_code,sw_code,yy,mm,reserved,serial,created_at
-MBP1SCNEA26030001,mBoard-pro-demo,1,,,,,,,,,,,,,
-MBL2CVHEA26080042,mBoard-lite-demo,1,,,,,,,,,,,,,
-MBB1SCNEA26030001,mBoard-basic,1,B,basic,1,S,C,N,E,A,26,03,00,01,2026-03-18T09:05:13.362569+00:00
+product_id,model,active,tier_code,tier_name,generation,origin_code,game_code,sensor_code,chip_code,sw_code,efuse_device_id,esp_device_id,esp_mac,chip_model,fw_version,yy,mm,reserved,serial,created_at
+MBP1SCNEA26030047,mBoard-pro,1,P,pro,1,S,C,N,E,A,MTBC80CFD8CBB0,MTBC80CFD8CBB0,BC:80:CF:D8:CB:B0,ESP32-D0WD-V3,A1.0.0,26,03,00,47,2026-03-20T09:23:29.646629+00:00

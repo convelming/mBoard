@@ -497,7 +497,12 @@ def append_product_to_whitelist(row: Dict[str, str]) -> None:
 
 
 def board_access_info(host: str, product_id: str, proto: str = "http") -> Dict[str, str]:
-    path = f"/gamespace.html?productId={quote(product_id)}"
+    # QR entry should start from scan/provision flow:
+    # 1) verify product id
+    # 2) check ESP32 online status
+    # 3) if offline -> BLE Wi-Fi provisioning
+    # 4) if online -> jump to board/game page
+    path = f"/scan/public/scan.html?id={quote(product_id)}"
     access_url = f"{proto}://{host}{path}"
     qr_url = (
         "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data="
@@ -564,6 +569,52 @@ def update_meta_updated_at(workspace: Path) -> None:
     except Exception:
         # Keep API robust; metadata update failure should not break writes.
         pass
+
+
+def board_online_status(workspace: Path, timeout_seconds: int = 90) -> Dict[str, Any]:
+    meta_path = workspace / "meta.json"
+    if not meta_path.exists():
+        return {"online": False, "last_seen": ""}
+
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"online": False, "last_seen": ""}
+
+    heartbeat_at = str(meta.get("esp_heartbeat_at") or "").strip()
+    if not heartbeat_at:
+        return {"online": False, "last_seen": ""}
+
+    try:
+        dt = datetime.fromisoformat(heartbeat_at.replace("Z", "+00:00"))
+        now_dt = datetime.now(timezone.utc)
+        online = (now_dt - dt).total_seconds() <= timeout_seconds
+        return {"online": bool(online), "last_seen": heartbeat_at}
+    except Exception:
+        return {"online": False, "last_seen": heartbeat_at}
+
+
+def update_board_heartbeat(workspace: Path, payload: Dict[str, Any]) -> Dict[str, Any]:
+    meta_path = workspace / "meta.json"
+    try:
+        if meta_path.exists():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        else:
+            meta = {}
+    except Exception:
+        meta = {}
+
+    meta["product_id"] = workspace.name
+    meta["esp_heartbeat_at"] = now_iso()
+    if payload.get("deviceId"):
+        meta["esp_device_id"] = str(payload.get("deviceId"))
+    if payload.get("fwVersion"):
+        meta["fw_version"] = str(payload.get("fwVersion"))
+    if payload.get("ip"):
+        meta["ip"] = str(payload.get("ip"))
+    meta["updated_at"] = now_iso()
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    return meta
 
 
 def next_row_id(path: Path) -> int:
@@ -861,15 +912,32 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
                 action = "/".join(board_parts[4:])
 
                 if method == "GET" and action == "status":
-                    self.require_product(product_id, create_workspace=True)
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    online_info = board_online_status(workspace)
+                    self.write_json(
+                        HTTPStatus.OK,
+                        {
+                            "ok": True,
+                            "productId": product_id,
+                            "online": online_info["online"],
+                            "lastSeen": online_info["last_seen"],
+                            "verified": True,
+                            "now": now_iso(),
+                        },
+                    )
+                    return
+
+                if method == "POST" and action == "heartbeat":
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    body = self.read_json_body()
+                    meta = update_board_heartbeat(workspace, body)
                     self.write_json(
                         HTTPStatus.OK,
                         {
                             "ok": True,
                             "productId": product_id,
                             "online": True,
-                            "verified": True,
-                            "now": now_iso(),
+                            "lastSeen": meta.get("esp_heartbeat_at", ""),
                         },
                     )
                     return

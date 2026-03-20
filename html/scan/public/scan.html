@@ -58,6 +58,7 @@
     const BLE_CHAR_WIFI_LIST = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a06';
 
     const q = new URLSearchParams(location.search);
+    const forceProvision = q.get('provision') === '1' || q.get('forceWifi') === '1';
     const idEl = document.getElementById('deviceId');
     const statusLine = document.getElementById('statusLine');
     const modal = document.getElementById('wifiModal');
@@ -78,7 +79,15 @@
 
     async function fetchJson(url, opt) {
       const r = await fetch(url, opt);
-      return r.json();
+      const text = await r.text();
+      let data = {};
+      try {
+        data = JSON.parse(text || '{}');
+      } catch {
+        data = { ok: false, error: text || `http-${r.status}` };
+      }
+      if (!r.ok && data && data.ok === undefined) data.ok = false;
+      return data;
     }
 
     function updateBleState(text) {
@@ -99,7 +108,7 @@
       } else if (stage === 'connected') {
         statusLine.innerHTML = `<span class="badge online">联网成功</span> IP: ${s.ip || '-'}，正在进入棋盘页...`;
         setTimeout(() => {
-          location.href = `/board?id=${encodeURIComponent(idEl.value.trim())}`;
+          location.href = `/gamespace.html?productId=${encodeURIComponent(idEl.value.trim())}`;
         }, 800);
       } else if (stage === 'failed') {
         statusLine.innerHTML = `<span class="badge offline">联网失败</span> ${s.msg || ''}`;
@@ -132,7 +141,11 @@
     }
 
     async function verifyProduct(id) {
-      const verify = await fetchJson(`/api/product/verify?id=${encodeURIComponent(id)}`);
+      const verify = await fetchJson('/api/scan/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: id })
+      });
       if (!verify.ok) {
         statusLine.textContent = '产品ID校验失败：请扫描棋盘上的二维码后再继续。';
         return false;
@@ -149,16 +162,23 @@
       const ok = await verifyProduct(id);
       if (!ok) return;
 
-      const d = await fetchJson(`/api/device/status?id=${encodeURIComponent(id)}`);
+      const d = await fetchJson(`/api/boards/${encodeURIComponent(id)}/status`);
       if (!d.ok) {
-        statusLine.textContent = '查询失败：' + (d.error || 'unknown');
+        statusLine.textContent = '查询设备状态失败，默认进入配网流程：' + (d.error || 'unknown');
+        modal.classList.add('show');
+        return;
+      }
+
+      if (forceProvision) {
+        statusLine.innerHTML = `<span class="badge offline">强制配网模式</span> 请连接蓝牙并填写 Wi-Fi`;
+        modal.classList.add('show');
         return;
       }
 
       if (d.online) {
         statusLine.innerHTML = `<span class="badge online">设备在线</span> 正在进入棋盘页...`;
         setTimeout(() => {
-          location.href = `/board?id=${encodeURIComponent(id)}`;
+          location.href = `/gamespace.html?productId=${encodeURIComponent(id)}`;
         }, 500);
       } else {
         statusLine.innerHTML = `<span class="badge offline">设备离线</span> 请先配网`;
@@ -235,16 +255,14 @@
       await provisionChar.writeValue(new TextEncoder().encode(payload));
       statusLine.innerHTML = `<span class="badge offline">已下发</span> 等待设备联网结果...`;
 
-      // Demo server 同步标记为 online，便于后续跳转页面联调
-      const d = await fetchJson('/api/device/provision', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, ssid, password })
-      });
-      if (!d.ok) {
-        alert('配网失败：' + (d.error || 'unknown'));
-        return;
-      }
+      // Optional demo endpoint; ignore if backend doesn't provide it.
+      try {
+        await fetchJson('/api/device/provision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, ssid, password })
+        });
+      } catch (_) {}
     }
 
     document.getElementById('checkBtn').onclick = () => checkStatus(true);
