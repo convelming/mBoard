@@ -83,6 +83,11 @@ PRODUCT_DEFAULT_FIELDS = [
     "sensor_code",
     "chip_code",
     "sw_code",
+    "efuse_device_id",
+    "esp_device_id",
+    "esp_mac",
+    "chip_model",
+    "fw_version",
     "yy",
     "mm",
     "reserved",
@@ -283,6 +288,32 @@ def normalize_two_digits(value: Any, *, name: str, min_val: int = 0, max_val: in
     return raw
 
 
+def normalize_optional_text(value: Any, *, max_len: int = 64) -> str:
+    text = str(value or "").strip()
+    if len(text) > max_len:
+        raise APIError(HTTPStatus.BAD_REQUEST, f"text too long (max {max_len})")
+    return text
+
+
+def normalize_optional_device_id(value: Any) -> str:
+    text = str(value or "").strip().upper()
+    if not text:
+        return ""
+    if not re.fullmatch(r"[A-Z0-9_-]{6,64}", text):
+        raise APIError(HTTPStatus.BAD_REQUEST, "invalid espDeviceId format")
+    return text
+
+
+def normalize_optional_mac(value: Any) -> str:
+    raw = str(value or "").strip().upper()
+    if not raw:
+        return ""
+    cleaned = re.sub(r"[^A-F0-9]", "", raw)
+    if len(cleaned) != 12:
+        raise APIError(HTTPStatus.BAD_REQUEST, "invalid espMac format")
+    return ":".join(cleaned[i : i + 2] for i in range(0, 12, 2))
+
+
 def parse_yy_mm(body: Dict[str, Any]) -> tuple[str, str]:
     production_month = str(body.get("productionMonth") or "").strip()
     yy = str(body.get("yy") or "").strip()
@@ -330,6 +361,13 @@ def make_product_id_from_body(body: Dict[str, Any]) -> Dict[str, str]:
 
     active_flag = bool(body.get("active", True))
     model_text = str(body.get("model") or f"mBoard-{TIER_NAME_MAP[tier_code]}").strip()
+    efuse_device_id = normalize_optional_device_id(
+        body.get("efuseDeviceId") or body.get("espDeviceId")
+    )
+    esp_device_id = normalize_optional_device_id(body.get("espDeviceId") or efuse_device_id)
+    esp_mac = normalize_optional_mac(body.get("espMac"))
+    chip_model = normalize_optional_text(body.get("chipModel"), max_len=64)
+    fw_version = normalize_optional_text(body.get("fwVersion"), max_len=32)
 
     return {
         "product_id": product_id,
@@ -343,6 +381,11 @@ def make_product_id_from_body(body: Dict[str, Any]) -> Dict[str, str]:
         "sensor_code": sensor_code,
         "chip_code": chip_code,
         "sw_code": sw_code,
+        "efuse_device_id": efuse_device_id,
+        "esp_device_id": esp_device_id,
+        "esp_mac": esp_mac,
+        "chip_model": chip_model,
+        "fw_version": fw_version,
         "yy": yy,
         "mm": mm,
         "reserved": reserved,

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mBoard 扫码接入测试</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>mBoard 扫码蓝牙配网</h1>
+      <p class="muted">流程：扫码 -> 校验产品ID -> 蓝牙连接 ESP32 -> 下发 Wi-Fi 账号密码 -> 设备联网后跳转棋盘页。</p>
+      <div class="row">
+        <label>设备ID <input id="deviceId" /></label>
+        <button id="checkBtn">检查在线状态</button>
+        <button id="forceOnBtn" class="ghost">测试：设为在线</button>
+      </div>
+      <p id="statusLine" class="muted"></p>
+    </div>
+  </div>
+
+  <div id="wifiModal" class="modal">
+    <div class="modal-card">
+      <h3>设备未联网，请蓝牙配网</h3>
+      <p class="muted">需要 Chrome(Android) 或支持 Web Bluetooth 的浏览器，且在 HTTPS 或 localhost 下访问。</p>
+      <div class="row" style="margin-bottom:10px">
+        <button id="connectBleBtn">1) 连接 ESP32 蓝牙</button>
+        <span id="bleState" class="muted">未连接</span>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <label>Wi-Fi 名称(SSID) <input id="wifiSsid" placeholder="例如 HomeWiFi" /></label>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <button id="scanWifiBtn" class="ghost">扫描可用 Wi-Fi</button>
+        <label>可选 Wi-Fi
+          <select id="wifiListSel">
+            <option value="">-- 先扫描或手动输入 --</option>
+          </select>
+        </label>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <label>密码 <input id="wifiPwd" type="password" placeholder="请输入Wi-Fi密码" /></label>
+      </div>
+      <div class="row">
+        <button id="provisionBtn">2) 发送配网信息</button>
+        <button id="cancelBtn" class="ghost">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BLE_SERVICE_UUID = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a01';
+    const BLE_CHAR_DEVICE_ID = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a02';
+    const BLE_CHAR_PROVISION = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a03';
+    const BLE_CHAR_STATUS = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a04';
+    const BLE_CHAR_COMMAND = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a05';
+    const BLE_CHAR_WIFI_LIST = '2f57c5fe-910f-4de9-8d0f-a7efb7b89a06';
+
+    const q = new URLSearchParams(location.search);
+    const idEl = document.getElementById('deviceId');
+    const statusLine = document.getElementById('statusLine');
+    const modal = document.getElementById('wifiModal');
+    const wifiSsid = document.getElementById('wifiSsid');
+    const wifiListSel = document.getElementById('wifiListSel');
+    const wifiPwd = document.getElementById('wifiPwd');
+    const bleState = document.getElementById('bleState');
+
+    let bleDevice = null;
+    let bleServer = null;
+    let provisionChar = null;
+    let statusChar = null;
+    let commandChar = null;
+    let wifiListChar = null;
+    let connectedDeviceId = '';
+
+    idEl.value = q.get('id') || 'MBP1SCNEA26030001';
+
+    async function fetchJson(url, opt) {
+      const r = await fetch(url, opt);
+      return r.json();
+    }
+
+    function updateBleState(text) {
+      bleState.textContent = text;
+    }
+
+    function parseStatusPayload(text) {
+      try { return JSON.parse(text); } catch { return { raw: text }; }
+    }
+
+    function onStatusNotification(evt) {
+      const bytes = evt.target.value;
+      const msg = new TextDecoder().decode(bytes);
+      const s = parseStatusPayload(msg);
+      const stage = s.stage || 'unknown';
+      if (stage === 'connecting') {
+        statusLine.innerHTML = `<span class="badge offline">连接中</span> ${s.msg || 'ESP32 正在连接路由器...'}`;
+      } else if (stage === 'connected') {
+        statusLine.innerHTML = `<span class="badge online">联网成功</span> IP: ${s.ip || '-'}，正在进入棋盘页...`;
+        setTimeout(() => {
+          location.href = `/board?id=${encodeURIComponent(idEl.value.trim())}`;
+        }, 800);
+      } else if (stage === 'failed') {
+        statusLine.innerHTML = `<span class="badge offline">联网失败</span> ${s.msg || ''}`;
+      } else {
+        statusLine.textContent = `设备状态: ${msg}`;
+      }
+    }
+
+    function onWifiListNotification(evt) {
+      const msg = new TextDecoder().decode(evt.target.value);
+      try {
+        const payload = JSON.parse(msg);
+        const list = payload.list || [];
+        wifiListSel.innerHTML = '<option value="">-- 选择检测到的 Wi-Fi --</option>';
+        list.forEach(item => {
+          if (!item || !item.ssid) return;
+          const op = document.createElement('option');
+          op.value = item.ssid;
+          op.textContent = `${item.ssid} (${item.rssi}dBm)`;
+          wifiListSel.appendChild(op);
+        });
+        if (list.length === 0) {
+          statusLine.textContent = '未扫描到可用 Wi-Fi，请手动输入 SSID。';
+        } else {
+          statusLine.textContent = `已扫描到 ${list.length} 个 Wi-Fi，可直接选择。`;
+        }
+      } catch {
+        statusLine.textContent = `Wi-Fi 扫描返回异常：${msg}`;
+      }
+    }
+
+    async function verifyProduct(id) {
+      const verify = await fetchJson(`/api/product/verify?id=${encodeURIComponent(id)}`);
+      if (!verify.ok) {
+        statusLine.textContent = '产品ID校验失败：请扫描棋盘上的二维码后再继续。';
+        return false;
+      }
+      return true;
+    }
+
+    async function checkStatus(autoOpenModal = true) {
+      const id = idEl.value.trim();
+      if (!id) {
+        statusLine.textContent = '请先输入设备ID';
+        return;
+      }
+      const ok = await verifyProduct(id);
+      if (!ok) return;
+
+      const d = await fetchJson(`/api/device/status?id=${encodeURIComponent(id)}`);
+      if (!d.ok) {
+        statusLine.textContent = '查询失败：' + (d.error || 'unknown');
+        return;
+      }
+
+      if (d.online) {
+        statusLine.innerHTML = `<span class="badge online">设备在线</span> 正在进入棋盘页...`;
+        setTimeout(() => {
+          location.href = `/board?id=${encodeURIComponent(id)}`;
+        }, 500);
+      } else {
+        statusLine.innerHTML = `<span class="badge offline">设备离线</span> 请先配网`;
+        if (autoOpenModal) modal.classList.add('show');
+      }
+    }
+
+    async function connectBle() {
+      const scannedId = idEl.value.trim();
+      if (!scannedId) return;
+      const ok = await verifyProduct(scannedId);
+      if (!ok) return;
+
+      if (!navigator.bluetooth) {
+        alert('当前浏览器不支持 Web Bluetooth，请使用 Chrome(Android) 或桌面 Chromium。');
+        return;
+      }
+
+      try {
+        updateBleState('正在请求蓝牙设备...');
+        bleDevice = await navigator.bluetooth.requestDevice({
+          filters: [{ services: [BLE_SERVICE_UUID] }],
+          optionalServices: [BLE_SERVICE_UUID]
+        });
+        bleServer = await bleDevice.gatt.connect();
+        const service = await bleServer.getPrimaryService(BLE_SERVICE_UUID);
+        const deviceIdChar = await service.getCharacteristic(BLE_CHAR_DEVICE_ID);
+        provisionChar = await service.getCharacteristic(BLE_CHAR_PROVISION);
+        statusChar = await service.getCharacteristic(BLE_CHAR_STATUS);
+        commandChar = await service.getCharacteristic(BLE_CHAR_COMMAND);
+        wifiListChar = await service.getCharacteristic(BLE_CHAR_WIFI_LIST);
+
+        const idBytes = await deviceIdChar.readValue();
+        connectedDeviceId = new TextDecoder().decode(idBytes).trim();
+        if (connectedDeviceId && connectedDeviceId !== scannedId) {
+          updateBleState(`已连接，但ID不匹配: BLE=${connectedDeviceId}`);
+          alert(`扫码ID(${scannedId}) 与蓝牙设备ID(${connectedDeviceId}) 不一致，请重试。`);
+          return;
+        }
+
+        await statusChar.startNotifications();
+        statusChar.addEventListener('characteristicvaluechanged', onStatusNotification);
+        await wifiListChar.startNotifications();
+        wifiListChar.addEventListener('characteristicvaluechanged', onWifiListNotification);
+        updateBleState(`已连接 ${connectedDeviceId || 'ESP32'}`);
+      } catch (err) {
+        updateBleState(`连接失败: ${err.message || err}`);
+      }
+    }
+
+    async function scanWifiList() {
+      if (!commandChar) {
+        alert('请先连接 ESP32 蓝牙');
+        return;
+      }
+      statusLine.textContent = '正在请求 ESP32 扫描周边 Wi-Fi...';
+      await commandChar.writeValue(new TextEncoder().encode('SCAN_WIFI'));
+    }
+
+    async function provision() {
+      const id = idEl.value.trim();
+      const ssid = (wifiListSel.value || wifiSsid.value || '').trim();
+      const password = wifiPwd.value;
+      if (!ssid || !password) {
+        alert('请填写 Wi-Fi 名称和密码');
+        return;
+      }
+      if (!provisionChar) {
+        alert('请先连接 ESP32 蓝牙');
+        return;
+      }
+
+      const payload = JSON.stringify({ deviceId: id, ssid, password });
+      await provisionChar.writeValue(new TextEncoder().encode(payload));
+      statusLine.innerHTML = `<span class="badge offline">已下发</span> 等待设备联网结果...`;
+
+      // Demo server 同步标记为 online，便于后续跳转页面联调
+      const d = await fetchJson('/api/device/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ssid, password })
+      });
+      if (!d.ok) {
+        alert('配网失败：' + (d.error || 'unknown'));
+        return;
+      }
+    }
+
+    document.getElementById('checkBtn').onclick = () => checkStatus(true);
+    document.getElementById('provisionBtn').onclick = provision;
+    document.getElementById('connectBleBtn').onclick = connectBle;
+    document.getElementById('scanWifiBtn').onclick = scanWifiList;
+    wifiListSel.onchange = () => {
+      if (wifiListSel.value) wifiSsid.value = wifiListSel.value;
+    };
+    document.getElementById('cancelBtn').onclick = () => modal.classList.remove('show');
+    document.getElementById('forceOnBtn').onclick = async () => {
+      const id = idEl.value.trim();
+      await fetchJson('/api/test/set-online', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, online: true })
+      });
+      checkStatus(false);
+    };
+
+    checkStatus(true);
+  </script>
+</body>
+</html>

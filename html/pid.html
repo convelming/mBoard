@@ -26,10 +26,31 @@
       <h1>Product ID 录入</h1>
       <p>命名规则：<code>MB + 型号 + 代际 + 产地 + C/V + N/H + 芯片 + 软件 + 年月 + 保留位 + 流水</code></p>
       <p class="muted">示例：<code>MBP1SCNEA26030001</code></p>
+      <p class="muted">建议先连接 ESP32 到电脑，点击“读取 ESP32 信息”自动填充硬件字段。</p>
     </section>
 
     <section class="card form-card">
+      <div class="actions" style="margin-bottom:12px">
+        <button type="button" id="readEspBtn">读取 ESP32 信息 (USB串口)</button>
+        <button type="button" id="useEspSerialBtn" class="ghost">用 ESP 序列号填充流水号</button>
+      </div>
       <form id="enrollForm" class="form-grid">
+        <label>eFuse Device ID
+          <input name="espDeviceId" id="espDeviceId" placeholder="例如 MTD211E5FE9C655D" />
+        </label>
+
+        <label>ESP MAC
+          <input name="espMac" id="espMac" placeholder="例如 D2:11:E5:9C:65:5D" />
+        </label>
+
+        <label>芯片型号
+          <input name="espChipModel" id="espChipModel" placeholder="例如 ESP32-S3" />
+        </label>
+
+        <label>固件版本
+          <input name="espFwVersion" id="espFwVersion" placeholder="例如 A1.0.3" />
+        </label>
+
         <label>型号
           <select name="tierCode" id="tierCode">
             <option value="B">Basic (B)</option>
