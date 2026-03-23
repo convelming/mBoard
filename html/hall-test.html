@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mTabula | 霍尔阵列测试</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./hall-test.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">mTabula <span>Hall Test</span></div>
+    <nav>
+      <a href="./index.html">首页</a>
+      <a href="./gamespace.html">游戏空间</a>
+      <a href="./pid.html">PID 管理</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="card controls">
+      <h1>霍尔传感器阵列测试</h1>
+      <p class="muted">输入 ESP32 地址与参数后，生成阵列网格并扫描显示激活强度（或二值）。</p>
+
+      <div class="grid">
+        <label>ESP32 IP / Host
+          <input id="host" value="192.168.1.100" placeholder="192.168.1.100:8080" />
+        </label>
+        <label>ESP32 ID
+          <input id="espId" value="MTD211E5FE9C655D" />
+        </label>
+        <label>Product ID
+          <input id="productId" value="MBP1SCNEA26030001" />
+        </label>
+
+        <label>行数 (Rows)
+          <input id="rows" type="number" min="1" max="64" value="11" />
+        </label>
+        <label>列数 (Cols)
+          <input id="cols" type="number" min="1" max="64" value="10" />
+        </label>
+        <label>请求路径
+          <input id="apiPath" value="/api/boards/{productId}/hall-latest" />
+        </label>
+
+        <label>显示模式
+          <select id="displayMode">
+            <option value="auto">自动识别</option>
+            <option value="intensity">强度热力</option>
+            <option value="binary">二值激活</option>
+          </select>
+        </label>
+        <label>二值阈值
+          <input id="threshold" type="number" min="0" max="4096" value="1" />
+        </label>
+        <label>轮询间隔(ms)
+          <input id="intervalMs" type="number" min="100" max="10000" value="500" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="buildBtn">生成网格</button>
+        <button id="scanOnceBtn" class="ghost">扫描一次</button>
+        <button id="startBtn">开始轮询</button>
+        <button id="stopBtn" class="ghost">停止轮询</button>
+      </div>
+
+      <p id="statusLine" class="muted"></p>
+    </section>
+
+    <section class="card board-card">
+      <div class="meta">
+        <div>模式：<strong id="metaMode">-</strong></div>
+        <div>激活数：<strong id="metaActive">0</strong></div>
+        <div>最大值：<strong id="metaMax">0</strong></div>
+      </div>
+      <div id="hallGrid" class="hall-grid"></div>
+    </section>
+  </main>
+
+  <script src="./hall-test.js"></script>
+</body>
+</html>

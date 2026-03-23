@@ -213,17 +213,12 @@
 
         const idBytes = await deviceIdChar.readValue();
         connectedDeviceId = new TextDecoder().decode(idBytes).trim();
-        if (connectedDeviceId && connectedDeviceId !== scannedId) {
-          updateBleState(`已连接，但ID不匹配: BLE=${connectedDeviceId}`);
-          alert(`扫码ID(${scannedId}) 与蓝牙设备ID(${connectedDeviceId}) 不一致，请重试。`);
-          return;
-        }
 
         await statusChar.startNotifications();
         statusChar.addEventListener('characteristicvaluechanged', onStatusNotification);
         await wifiListChar.startNotifications();
         wifiListChar.addEventListener('characteristicvaluechanged', onWifiListNotification);
-        updateBleState(`已连接 ${connectedDeviceId || 'ESP32'}`);
+        updateBleState(`已连接 BLE设备=${connectedDeviceId || 'ESP32'} / Product=${scannedId}`);
       } catch (err) {
         updateBleState(`连接失败: ${err.message || err}`);
       }
@@ -251,7 +246,13 @@
         return;
       }
 
-      const payload = JSON.stringify({ deviceId: id, ssid, password });
+      const payload = JSON.stringify({
+        productId: id,
+        deviceId: connectedDeviceId || '',
+        backendUrl: window.location.origin,
+        ssid,
+        password
+      });
       await provisionChar.writeValue(new TextEncoder().encode(payload));
       statusLine.innerHTML = `<span class="badge offline">已下发</span> 等待设备联网结果...`;
 

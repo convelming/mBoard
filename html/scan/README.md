@@ -46,6 +46,7 @@ npm start
 ## ESP32 固件
 - 示例文件：`scan/esp32_ble_provision/esp32_ble_provision.ino`
 - 仅用于 USB 读取芯片信息（给 PID 页面）：`scan/esp32_device_info/esp32_device_info.ino`
+- 一体化联调（配网 + 心跳 + 霍尔上报）：`scan/esp32_hall_uplink/esp32_hall_uplink.ino`
 - Arduino IDE 选择 ESP32 开发板后直接编译下载。
 - 固件特性：
   - `device_id` 基于 eFuse MAC 生成
@@ -59,3 +60,7 @@ npm start
 
 ## 测试接口
 - `POST /api/test/set-online` 可快速切设备在线状态
+
+## 后端霍尔数据接口（Python backend）
+- `POST /api/boards/<productId>/hall-frame`
+- `GET /api/boards/<productId>/hall-latest`

@@ -71,6 +71,19 @@ SENSOR_FIELDS = [
     "raw_json",
 ]
 
+HALL_FRAME_FIELDS = [
+    "id",
+    "timestamp",
+    "board_id",
+    "esp32_id",
+    "rows",
+    "cols",
+    "mode",
+    "active_count",
+    "max_value",
+    "values_json",
+]
+
 PRODUCT_DEFAULT_FIELDS = [
     "product_id",
     "model",
@@ -539,6 +552,7 @@ def ensure_product_workspace(product_id: str) -> Path:
     ensure_csv_file(workspace / "configs.csv", CONFIG_FIELDS)
     ensure_csv_file(workspace / "commands.csv", COMMAND_FIELDS)
     ensure_csv_file(workspace / "sensor_moves.csv", SENSOR_FIELDS)
+    ensure_csv_file(workspace / "hall_frames.csv", HALL_FRAME_FIELDS)
 
     meta_path = workspace / "meta.json"
     if not meta_path.exists():
@@ -569,6 +583,24 @@ def update_meta_updated_at(workspace: Path) -> None:
     except Exception:
         # Keep API robust; metadata update failure should not break writes.
         pass
+
+
+def write_hall_latest(workspace: Path, payload: Dict[str, Any]) -> None:
+    latest = workspace / "hall_latest.json"
+    latest.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def read_hall_latest(workspace: Path) -> Dict[str, Any]:
+    latest = workspace / "hall_latest.json"
+    if not latest.exists():
+        return {}
+    try:
+        return json.loads(latest.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 def board_online_status(workspace: Path, timeout_seconds: int = 90) -> Dict[str, Any]:
@@ -940,6 +972,77 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
                             "lastSeen": meta.get("esp_heartbeat_at", ""),
                         },
                     )
+                    return
+
+                if method == "POST" and action == "hall-frame":
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    body = self.read_json_body()
+                    rows = int(body.get("rows") or 0)
+                    cols = int(body.get("cols") or 0)
+                    mode = str(body.get("mode") or "intensity")
+                    values = body.get("values")
+                    if not isinstance(values, list):
+                        raise APIError(HTTPStatus.BAD_REQUEST, "values must be list")
+                    esp32_id = str(body.get("esp32Id") or body.get("deviceId") or "").strip()
+                    active_count = int(body.get("activeCount") or 0)
+                    max_value = float(body.get("maxValue") or 0)
+                    ts = str(body.get("ts") or now_iso())
+
+                    row_id = append_csv(
+                        workspace / "hall_frames.csv",
+                        HALL_FRAME_FIELDS,
+                        {
+                            "timestamp": ts,
+                            "board_id": product_id,
+                            "esp32_id": esp32_id,
+                            "rows": rows,
+                            "cols": cols,
+                            "mode": mode,
+                            "active_count": active_count,
+                            "max_value": max_value,
+                            "values_json": json.dumps(values, ensure_ascii=False),
+                        },
+                    )
+
+                    write_hall_latest(
+                        workspace,
+                        {
+                            "ok": True,
+                            "id": row_id,
+                            "productId": product_id,
+                            "esp32Id": esp32_id,
+                            "rows": rows,
+                            "cols": cols,
+                            "mode": mode,
+                            "activeCount": active_count,
+                            "maxValue": max_value,
+                            "values": values,
+                            "ts": ts,
+                        },
+                    )
+                    update_meta_updated_at(workspace)
+                    self.write_json(HTTPStatus.OK, {"ok": True, "id": row_id})
+                    return
+
+                if method == "GET" and action == "hall-latest":
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    latest = read_hall_latest(workspace)
+                    if not latest:
+                        self.write_json(
+                            HTTPStatus.OK,
+                            {
+                                "ok": True,
+                                "productId": product_id,
+                                "mode": "intensity",
+                                "rows": 0,
+                                "cols": 0,
+                                "values": [],
+                                "ts": "",
+                            },
+                        )
+                        return
+                    latest["ok"] = True
+                    self.write_json(HTTPStatus.OK, latest)
                     return
 
                 if method == "POST" and action == "moves":
