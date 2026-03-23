@@ -6,7 +6,8 @@
   var colsEl = document.getElementById('cols');
   var apiPathEl = document.getElementById('apiPath');
   var displayModeEl = document.getElementById('displayMode');
-  var thresholdEl = document.getElementById('threshold');
+  var offColorEl = document.getElementById('offColor');
+  var onColorEl = document.getElementById('onColor');
   var intervalEl = document.getElementById('intervalMs');
   var statusLine = document.getElementById('statusLine');
   var gridEl = document.getElementById('hallGrid');
@@ -17,6 +18,7 @@
   var timer = null;
   var cellEls = [];
   var gridGapPx = 2;
+  var lastPayload = { values: [], mode: 'intensity' };
 
   function i(value, fallback) {
     var n = parseInt(value, 10);
@@ -42,7 +44,8 @@
       cols: colsEl.value,
       apiPath: apiPathEl.value.trim(),
       displayMode: displayModeEl.value,
-      threshold: thresholdEl.value,
+      offColor: offColorEl.value,
+      onColor: onColorEl.value,
       interval: intervalEl.value
     };
     localStorage.setItem('hall_test_cfg', JSON.stringify(cfg));
@@ -58,7 +61,8 @@
       if (cfg.cols) colsEl.value = cfg.cols;
       if (cfg.apiPath) apiPathEl.value = cfg.apiPath;
       if (cfg.displayMode) displayModeEl.value = cfg.displayMode;
-      if (cfg.threshold) thresholdEl.value = cfg.threshold;
+      if (cfg.offColor) offColorEl.value = cfg.offColor;
+      if (cfg.onColor) onColorEl.value = cfg.onColor;
       if (cfg.interval) intervalEl.value = cfg.interval;
     } catch (_) {}
   }
@@ -160,12 +164,15 @@
   }
 
   function render(values, sourceMode) {
+    lastPayload = { values: values || [], mode: sourceMode || 'intensity' };
     var rows = clamp(i(rowsEl.value, 10), 1, 64);
     var cols = clamp(i(colsEl.value, 11), 1, 64);
     var total = rows * cols;
-    var threshold = parseNumeric(thresholdEl.value);
+    var threshold = 0;
     var mode = displayModeEl.value;
     if (mode === 'auto') mode = sourceMode === 'binary' ? 'binary' : 'intensity';
+    var offColor = offColorEl.value || '#1f2a40';
+    var onColor = onColorEl.value || '#2ad4a7';
 
     var flat = toFlat(values, rows, cols);
     var maxVal = 0;
@@ -183,12 +190,11 @@
       var isOn = v > threshold;
 
       if (mode === 'binary') {
-        cell.style.background = isOn ? 'rgba(42, 212, 167, 0.85)' : 'rgba(20, 28, 44, 0.7)';
+        cell.style.background = isOn ? onColor : offColor;
       } else {
         var t = clamp(v / maxVal, 0, 1);
-        var hue = 220 - Math.round(220 * t);
-        var alpha = 0.25 + t * 0.75;
-        cell.style.background = 'hsla(' + hue + ', 90%, 55%, ' + alpha + ')';
+        var c = blendHex(offColor, onColor, t);
+        cell.style.background = c;
       }
       cell.innerHTML = '<div>' + (v.toFixed ? v.toFixed(1) : v) + '</div>';
     }
@@ -197,6 +203,35 @@
     metaActive.textContent = String(active);
     metaMax.textContent = String((Math.round(maxVal * 100) / 100));
     fitGridToViewport();
+  }
+
+  function hexToRgb(hex) {
+    var s = String(hex || '').replace('#', '').trim();
+    if (s.length === 3) s = s[0] + s[0] + s[1] + s[1] + s[2] + s[2];
+    if (s.length !== 6) return { r: 31, g: 42, b: 64 };
+    var n = parseInt(s, 16);
+    if (isNaN(n)) return { r: 31, g: 42, b: 64 };
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  function rgbToHex(r, g, b) {
+    function x(v) {
+      var n = clamp(Math.round(v), 0, 255);
+      var s = n.toString(16);
+      return s.length === 1 ? '0' + s : s;
+    }
+    return '#' + x(r) + x(g) + x(b);
+  }
+
+  function blendHex(a, b, t) {
+    var c1 = hexToRgb(a);
+    var c2 = hexToRgb(b);
+    var k = clamp(t, 0, 1);
+    return rgbToHex(
+      c1.r + (c2.r - c1.r) * k,
+      c1.g + (c2.g - c1.g) * k,
+      c1.b + (c2.b - c1.b) * k
+    );
   }
 
   function normalizeHost(raw) {
@@ -265,9 +300,20 @@
 
   [
     hostEl, espIdEl, productIdEl, rowsEl, colsEl, apiPathEl,
-    displayModeEl, thresholdEl, intervalEl
+    intervalEl
   ].forEach(function (el) {
     el.addEventListener('change', saveConfig);
+  });
+
+  [displayModeEl, offColorEl, onColorEl].forEach(function (el) {
+    el.addEventListener('change', function () {
+      saveConfig();
+      render(lastPayload.values, lastPayload.mode);
+    });
+    el.addEventListener('input', function () {
+      saveConfig();
+      render(lastPayload.values, lastPayload.mode);
+    });
   });
 
   loadConfig();
