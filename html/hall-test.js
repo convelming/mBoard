@@ -16,6 +16,7 @@
 
   var timer = null;
   var cellEls = [];
+  var gridGapPx = 2;
 
   function i(value, fallback) {
     var n = parseInt(value, 10);
@@ -63,8 +64,8 @@
   }
 
   function buildGrid() {
-    var rows = clamp(i(rowsEl.value, 11), 1, 64);
-    var cols = clamp(i(colsEl.value, 10), 1, 64);
+    var rows = clamp(i(rowsEl.value, 10), 1, 64);
+    var cols = clamp(i(colsEl.value, 11), 1, 64);
     rowsEl.value = String(rows);
     colsEl.value = String(cols);
 
@@ -81,6 +82,25 @@
         cellEls.push(cell);
       }
     }
+    fitGridToViewport();
+  }
+
+  function fitGridToViewport() {
+    if (!cellEls.length) return;
+    var rows = clamp(i(rowsEl.value, 10), 1, 64);
+    var cols = clamp(i(colsEl.value, 11), 1, 64);
+
+    var rect = gridEl.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    var gap = gridGapPx;
+    var maxCellW = (rect.width - (cols - 1) * gap) / cols;
+    var maxCellH = (rect.height - (rows - 1) * gap) / rows;
+    var cell = Math.floor(Math.max(8, Math.min(maxCellW, maxCellH)));
+
+    // Apply fixed tracks so the full matrix always fits in available area.
+    gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cell + 'px)';
+    gridEl.style.gridTemplateRows = 'repeat(' + rows + ', ' + cell + 'px)';
   }
 
   function parseNumeric(v) {
@@ -140,8 +160,8 @@
   }
 
   function render(values, sourceMode) {
-    var rows = clamp(i(rowsEl.value, 11), 1, 64);
-    var cols = clamp(i(colsEl.value, 10), 1, 64);
+    var rows = clamp(i(rowsEl.value, 10), 1, 64);
+    var cols = clamp(i(colsEl.value, 11), 1, 64);
     var total = rows * cols;
     var threshold = parseNumeric(thresholdEl.value);
     var mode = displayModeEl.value;
@@ -176,6 +196,7 @@
     metaMode.textContent = mode;
     metaActive.textContent = String(active);
     metaMax.textContent = String((Math.round(maxVal * 100) / 100));
+    fitGridToViewport();
   }
 
   function normalizeHost(raw) {
@@ -195,8 +216,8 @@
       return;
     }
 
-    var rows = clamp(i(rowsEl.value, 11), 1, 64);
-    var cols = clamp(i(colsEl.value, 10), 1, 64);
+    var rows = clamp(i(rowsEl.value, 10), 1, 64);
+    var cols = clamp(i(colsEl.value, 11), 1, 64);
     var productId = productIdEl.value.trim();
     var path = (apiPathEl.value || '/api/boards/{productId}/hall-latest').trim();
     path = path.replace('{productId}', encodeURIComponent(productId));
@@ -251,4 +272,5 @@
 
   loadConfig();
   buildGrid();
+  window.addEventListener('resize', fitGridToViewport);
 })();

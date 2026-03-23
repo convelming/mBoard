@@ -22,7 +22,7 @@
   <main class="shell">
     <section class="card controls">
       <h1>霍尔传感器阵列测试</h1>
-      <p class="muted">输入 ESP32 地址与参数后，生成阵列网格并扫描显示激活强度（或二值）。</p>
+      <p class="muted">配置参数后即可轮询显示阵列强度/二值。</p>
 
       <div class="grid">
         <label>ESP32 IP / Host
@@ -36,10 +36,10 @@
         </label>
 
         <label>行数 (Rows)
-          <input id="rows" type="number" min="1" max="64" value="11" />
+          <input id="rows" type="number" min="1" max="64" value="10" />
         </label>
         <label>列数 (Cols)
-          <input id="cols" type="number" min="1" max="64" value="10" />
+          <input id="cols" type="number" min="1" max="64" value="11" />
         </label>
         <label>请求路径
           <input id="apiPath" value="/api/boards/{productId}/hall-latest" />
