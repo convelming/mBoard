@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
 #include <Preferences.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -27,8 +28,15 @@ static const char* CHAR_COMMAND_UUID = "2f57c5fe-910f-4de9-8d0f-a7efb7b89a05";
 static const char* CHAR_WIFI_LIST_UUID = "2f57c5fe-910f-4de9-8d0f-a7efb7b89a06";
 
 // Hall matrix config
-static const int HALL_ROWS = 11;
-static const int HALL_COLS = 10;
+// Board sensing area defaults to 10x11.
+// You can reserve extra rows/cols for captured-piece parking area.
+static const int HALL_BOARD_ROWS = 10;
+static const int HALL_BOARD_COLS = 11;
+static const int HALL_EXTRA_ROWS = 0;
+static const int HALL_EXTRA_COLS = 0;
+
+static const int HALL_ROWS = HALL_BOARD_ROWS + HALL_EXTRA_ROWS;
+static const int HALL_COLS = HALL_BOARD_COLS + HALL_EXTRA_COLS;
 static const int HALL_CELLS = HALL_ROWS * HALL_COLS;
 static const int HALL_CHANGE_THRESHOLD = 1; // report immediately if changed more than this
 #define HALL_USE_MOCK 1
@@ -41,11 +49,19 @@ String gDeviceId;
 String gFwVersion = "A2.0.0";
 String gProductId = "";
 String gBackendUrl = "http://192.168.1.100:8866";
+String gSoftApSsid = "mTabula-Setup";
+WebServer gProvisionServer(80);
 
 int gLastValues[HALL_CELLS];
 uint32_t gLastHallPushMs = 0;
 uint32_t gLastHeartbeatMs = 0;
 bool gWifiReady = false;
+
+void sendCors() {
+  gProvisionServer.sendHeader("Access-Control-Allow-Origin", "*");
+  gProvisionServer.sendHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  gProvisionServer.sendHeader("Access-Control-Allow-Headers", "Content-Type");
+}
 
 String jsonGet(const String& src, const char* key) {
   String k = String("\"") + key + "\"";
@@ -58,6 +74,27 @@ String jsonGet(const String& src, const char* key) {
   int q2 = src.indexOf('"', q1 + 1);
   if (q2 < 0) return "";
   return src.substring(q1 + 1, q2);
+}
+
+String jsonEscape(const String& in) {
+  String out;
+  out.reserve(in.length() + 8);
+  for (size_t i = 0; i < in.length(); i++) {
+    char c = in.charAt(i);
+    if (c == '\\' || c == '"') {
+      out += '\\';
+      out += c;
+    } else if (c == '\n') {
+      out += "\\n";
+    } else if (c == '\r') {
+      out += "\\r";
+    } else if (c == '\t') {
+      out += "\\t";
+    } else {
+      out += c;
+    }
+  }
+  return out;
 }
 
 String getDeviceId() {
@@ -93,7 +130,7 @@ void printDeviceInfoJson() {
 }
 
 bool connectWiFi(const String& ssid, const String& password, uint32_t timeoutMs = 20000) {
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
   uint32_t t0 = millis();
   while (WiFi.status() != WL_CONNECTED && (millis() - t0) < timeoutMs) {
@@ -128,21 +165,104 @@ void saveProvision(const String& productId, const String& ssid, const String& pa
   prefs.end();
 }
 
-void notifyWifiList() {
-  if (!charWifiList) return;
-  WiFi.mode(WIFI_STA);
+void handleProvisionOptions() {
+  sendCors();
+  gProvisionServer.send(204);
+}
+
+void handleProvisionHealth() {
+  sendCors();
+  String body = "{\"ok\":true,\"deviceId\":\"" + gDeviceId + "\",\"apSsid\":\"" + gSoftApSsid + "\"}";
+  gProvisionServer.send(200, "application/json", body);
+}
+
+void handleProvisionRoot() {
+  sendCors();
+  String body = "mTabula SoftAP ready. POST /provision with JSON: {productId,ssid,password,backendUrl}";
+  gProvisionServer.send(200, "text/plain", body);
+}
+
+String wifiListJson(int maxItems, int maxBytes, bool includeOkField) {
+  WiFi.mode(WIFI_AP_STA);
   int n = WiFi.scanNetworks();
-  String payload = "{\"list\":[";
+  String payload = includeOkField ? "{\"ok\":true,\"list\":[" : "{\"list\":[";
   int count = 0;
   for (int i = 0; i < n; i++) {
     String ssid = WiFi.SSID(i);
     if (ssid.length() == 0) continue;
+    String item = "{\"ssid\":\"" + jsonEscape(ssid) + "\",\"rssi\":" + String(WiFi.RSSI(i)) + "}";
+    int extraComma = count > 0 ? 1 : 0;
+    if (maxBytes > 0 && (int)(payload.length() + extraComma + item.length() + 2) > maxBytes) break;
     if (count > 0) payload += ",";
-    payload += "{\"ssid\":\"" + ssid + "\",\"rssi\":" + String(WiFi.RSSI(i)) + "}";
+    payload += item;
     count++;
-    if (count >= 15) break;
+    if (maxItems > 0 && count >= maxItems) break;
   }
   payload += "]}";
+  WiFi.scanDelete();
+  return payload;
+}
+
+void handleWifiScan() {
+  sendCors();
+  gProvisionServer.send(200, "application/json", wifiListJson(20, 4096, true));
+}
+
+void handleProvisionPost() {
+  String raw = gProvisionServer.arg("plain");
+  String productId = jsonGet(raw, "productId");
+  String ssid = jsonGet(raw, "ssid");
+  String password = jsonGet(raw, "password");
+  String backend = jsonGet(raw, "backendUrl");
+
+  if (productId.length() == 0) {
+    sendCors();
+    gProvisionServer.send(400, "application/json", "{\"ok\":false,\"error\":\"missing productId\"}");
+    return;
+  }
+  if (ssid.length() == 0) {
+    sendCors();
+    gProvisionServer.send(400, "application/json", "{\"ok\":false,\"error\":\"missing ssid\"}");
+    return;
+  }
+
+  saveProvision(productId, ssid, password, backend);
+  gProductId = productId;
+  if (backend.length() > 0) gBackendUrl = backend;
+
+  notifyStatus("connecting", "wifi connecting");
+  bool ok = connectWiFi(ssid, password);
+  gWifiReady = ok;
+  if (ok) {
+    notifyStatus("connected", "wifi connected", WiFi.localIP().toString());
+    sendHeartbeat();
+    pushHallFrame(true);
+    sendCors();
+    gProvisionServer.send(200, "application/json", "{\"ok\":true,\"stage\":\"connected\"}");
+  } else {
+    notifyStatus("failed", "wifi connect failed");
+    sendCors();
+    gProvisionServer.send(500, "application/json", "{\"ok\":false,\"error\":\"wifi connect failed\"}");
+  }
+}
+
+void setupSoftApProvision() {
+  gSoftApSsid = "mTabula-" + gDeviceId.substring(gDeviceId.length() - 4);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(gSoftApSsid.c_str());
+  Serial.printf("SoftAP started: SSID=%s IP=%s\n", gSoftApSsid.c_str(), WiFi.softAPIP().toString().c_str());
+
+  gProvisionServer.on("/", HTTP_GET, handleProvisionRoot);
+  gProvisionServer.on("/health", HTTP_GET, handleProvisionHealth);
+  gProvisionServer.on("/wifi-scan", HTTP_GET, handleWifiScan);
+  gProvisionServer.on("/provision", HTTP_OPTIONS, handleProvisionOptions);
+  gProvisionServer.on("/provision", HTTP_POST, handleProvisionPost);
+  gProvisionServer.begin();
+}
+
+void notifyWifiList() {
+  if (!charWifiList) return;
+  String payload = wifiListJson(6, 180, false);
   charWifiList->setValue(payload.c_str());
   charWifiList->notify();
 }
@@ -246,9 +366,8 @@ void pushHallFrame(bool forcePush) {
 
 class ProvisionCallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value = characteristic->getValue();
-    if (value.empty()) return;
-    String s = String(value.c_str());
+    String s = characteristic->getValue();
+    if (s.length() == 0) return;
 
     String productId = jsonGet(s, "productId");
     String ssid = jsonGet(s, "ssid");
@@ -283,9 +402,8 @@ class ProvisionCallback : public BLECharacteristicCallbacks {
 
 class CommandCallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value = characteristic->getValue();
-    if (value.empty()) return;
-    String cmd = String(value.c_str());
+    String cmd = characteristic->getValue();
+    if (cmd.length() == 0) return;
     cmd.trim();
     cmd.toUpperCase();
     if (cmd == "SCAN_WIFI") {
@@ -334,6 +452,7 @@ void setup() {
   gDeviceId = getDeviceId();
   printDeviceInfoJson();
   for (int i = 0; i < HALL_CELLS; i++) gLastValues[i] = -9999;
+  setupSoftApProvision();
   loadConfig();
   setupBLE();
 }
@@ -362,5 +481,6 @@ void loop() {
   }
 
   pushHallFrame(false);
+  gProvisionServer.handleClient();
   delay(80);
 }

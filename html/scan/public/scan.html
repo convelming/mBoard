@@ -9,8 +9,8 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>mBoard 扫码蓝牙配网</h1>
-      <p class="muted">流程：扫码 -> 校验产品ID -> 蓝牙连接 ESP32 -> 下发 Wi-Fi 账号密码 -> 设备联网后跳转棋盘页。</p>
+      <h1>mBoard 扫码配网</h1>
+      <p class="muted">流程：扫码 -> 校验 Product ID -> 配网（Android/桌面走 BLE，iOS 走 SoftAP）-> 设备联网后进入棋盘页。</p>
       <div class="row">
         <label>设备ID <input id="deviceId" /></label>
         <button id="checkBtn">检查在线状态</button>
@@ -22,29 +22,62 @@
 
   <div id="wifiModal" class="modal">
     <div class="modal-card">
-      <h3>设备未联网，请蓝牙配网</h3>
-      <p class="muted">需要 Chrome(Android) 或支持 Web Bluetooth 的浏览器，且在 HTTPS 或 localhost 下访问。</p>
-      <div class="row" style="margin-bottom:10px">
-        <button id="connectBleBtn">1) 连接 ESP32 蓝牙</button>
-        <span id="bleState" class="muted">未连接</span>
+      <h3 id="provisionTitle">设备未联网，请先完成配网</h3>
+      <p id="provisionHint" class="muted">Android / 桌面建议使用 Web Bluetooth；iOS 自动切换 SoftAP 配网。</p>
+
+      <div id="blePanel">
+        <div class="row" style="margin-bottom:10px">
+          <button id="connectBleBtn">1) 连接 ESP32 蓝牙</button>
+          <span id="bleState" class="muted">未连接</span>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <button id="scanWifiBtn" class="ghost">扫描可用 Wi-Fi</button>
+          <label>可选 Wi-Fi
+            <select id="wifiListSel">
+              <option value="">-- 先扫描或手动输入 --</option>
+            </select>
+          </label>
+        </div>
+        <div id="wifiListBox" class="row" style="margin-bottom:10px"></div>
+        <div class="row" style="margin-bottom:10px">
+          <label>Wi-Fi 名称(SSID) <input id="wifiSsid" placeholder="例如 HomeWiFi" /></label>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <label>密码 <input id="wifiPwd" type="password" placeholder="请输入 Wi-Fi 密码" /></label>
+        </div>
+        <div class="row">
+          <button id="provisionBtn">2) 发送配网信息</button>
+          <button id="cancelBtn" class="ghost">取消</button>
+        </div>
       </div>
-      <div class="row" style="margin-bottom:10px">
-        <label>Wi-Fi 名称(SSID) <input id="wifiSsid" placeholder="例如 HomeWiFi" /></label>
-      </div>
-      <div class="row" style="margin-bottom:10px">
-        <button id="scanWifiBtn" class="ghost">扫描可用 Wi-Fi</button>
-        <label>可选 Wi-Fi
-          <select id="wifiListSel">
-            <option value="">-- 先扫描或手动输入 --</option>
-          </select>
-        </label>
-      </div>
-      <div class="row" style="margin-bottom:10px">
-        <label>密码 <input id="wifiPwd" type="password" placeholder="请输入Wi-Fi密码" /></label>
-      </div>
-      <div class="row">
-        <button id="provisionBtn">2) 发送配网信息</button>
-        <button id="cancelBtn" class="ghost">取消</button>
+
+      <div id="iosPanel" style="display:none">
+        <p class="muted">iOS 不走 Web Bluetooth。请先在系统 Wi-Fi 中连接 ESP32 热点，再提交路由器账号密码。</p>
+        <div class="row" style="margin-bottom:10px">
+          <label>ESP32 SoftAP Host
+            <input id="softapHost" value="192.168.4.1" />
+          </label>
+          <button id="openSoftapBtn" class="ghost">打开设备页</button>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <button id="iosScanWifiBtn" class="ghost">扫描可用 Wi-Fi</button>
+          <label>可选 Wi-Fi
+            <select id="iosWifiListSel">
+              <option value="">-- 先扫描或手动输入 --</option>
+            </select>
+          </label>
+        </div>
+        <div id="iosWifiListBox" class="row" style="margin-bottom:10px"></div>
+        <div class="row" style="margin-bottom:10px">
+          <label>Wi-Fi 名称(SSID) <input id="iosWifiSsid" placeholder="例如 HomeWiFi" /></label>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <label>密码 <input id="iosWifiPwd" type="password" placeholder="请输入 Wi-Fi 密码" /></label>
+        </div>
+        <div class="row">
+          <button id="iosProvisionBtn">提交 SoftAP 配网</button>
+          <button id="cancelBtnIos" class="ghost">取消</button>
+        </div>
       </div>
     </div>
   </div>
@@ -62,10 +95,25 @@
     const idEl = document.getElementById('deviceId');
     const statusLine = document.getElementById('statusLine');
     const modal = document.getElementById('wifiModal');
+
     const wifiSsid = document.getElementById('wifiSsid');
     const wifiListSel = document.getElementById('wifiListSel');
     const wifiPwd = document.getElementById('wifiPwd');
+    const wifiListBox = document.getElementById('wifiListBox');
     const bleState = document.getElementById('bleState');
+
+    const blePanel = document.getElementById('blePanel');
+    const iosPanel = document.getElementById('iosPanel');
+    const provisionTitle = document.getElementById('provisionTitle');
+    const provisionHint = document.getElementById('provisionHint');
+    const softapHostEl = document.getElementById('softapHost');
+    const iosWifiListSel = document.getElementById('iosWifiListSel');
+    const iosWifiListBox = document.getElementById('iosWifiListBox');
+    const iosWifiSsidEl = document.getElementById('iosWifiSsid');
+    const iosWifiPwdEl = document.getElementById('iosWifiPwd');
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     let bleDevice = null;
     let bleServer = null;
@@ -90,12 +138,85 @@
       return data;
     }
 
+    function setProvisionModeUI() {
+      if (isIOS) {
+        provisionTitle.textContent = '设备未联网，请使用 iOS SoftAP 配网';
+        provisionHint.textContent = '可先扫描可用 Wi-Fi，再选择或手动输入 SSID。';
+        blePanel.style.display = 'none';
+        iosPanel.style.display = 'block';
+      } else {
+        provisionTitle.textContent = '设备未联网，请先完成配网';
+        if (!window.isSecureContext) {
+          provisionHint.textContent = '当前页面不是安全上下文。Web Bluetooth 需在 https 或 localhost 下使用。';
+        } else {
+          provisionHint.textContent = '当前设备支持 Web Bluetooth，可直接连接 ESP32 下发 Wi-Fi。';
+        }
+        blePanel.style.display = 'block';
+        iosPanel.style.display = 'none';
+      }
+    }
+
+    function bleUnavailableReason() {
+      if (isIOS) {
+        return 'iOS 浏览器（包括 Chrome iOS）不支持 Web Bluetooth，请改走 SoftAP 配网。';
+      }
+      if (!window.isSecureContext) {
+        return '当前页面不是安全上下文。请使用 https 或 localhost 打开页面后再连接蓝牙。';
+      }
+      if (!navigator.bluetooth) {
+        return '当前浏览器内核不支持 Web Bluetooth，请使用 Android Chrome 或桌面 Chromium。';
+      }
+      return '';
+    }
+
     function updateBleState(text) {
       bleState.textContent = text;
     }
 
     function parseStatusPayload(text) {
       try { return JSON.parse(text); } catch { return { raw: text }; }
+    }
+
+    function normalizeWifiList(payload) {
+      const src = payload && Array.isArray(payload.list) ? payload.list : [];
+      const out = [];
+      for (let i = 0; i < src.length; i += 1) {
+        const item = src[i];
+        if (typeof item === 'string') {
+          if (item.trim()) out.push({ ssid: item.trim(), rssi: 0 });
+          continue;
+        }
+        if (!item || !item.ssid) continue;
+        out.push({
+          ssid: String(item.ssid).trim(),
+          rssi: Number(item.rssi || 0)
+        });
+      }
+      return out.filter(x => x.ssid);
+    }
+
+    function renderWifiChoices(sel, box, inputEl, list) {
+      sel.innerHTML = '<option value="">-- 先扫描或手动输入 --</option>';
+      box.innerHTML = '';
+      for (let i = 0; i < list.length; i += 1) {
+        const item = list[i];
+        const op = document.createElement('option');
+        op.value = item.ssid;
+        op.textContent = `${item.ssid} (${item.rssi}dBm)`;
+        sel.appendChild(op);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ghost';
+        btn.style.fontSize = '12px';
+        btn.style.padding = '6px 10px';
+        btn.textContent = item.ssid;
+        btn.onclick = () => {
+          inputEl.value = item.ssid;
+          sel.value = item.ssid;
+        };
+        box.appendChild(btn);
+      }
     }
 
     function onStatusNotification(evt) {
@@ -121,22 +242,15 @@
       const msg = new TextDecoder().decode(evt.target.value);
       try {
         const payload = JSON.parse(msg);
-        const list = payload.list || [];
-        wifiListSel.innerHTML = '<option value="">-- 选择检测到的 Wi-Fi --</option>';
-        list.forEach(item => {
-          if (!item || !item.ssid) return;
-          const op = document.createElement('option');
-          op.value = item.ssid;
-          op.textContent = `${item.ssid} (${item.rssi}dBm)`;
-          wifiListSel.appendChild(op);
-        });
+        const list = normalizeWifiList(payload);
+        renderWifiChoices(wifiListSel, wifiListBox, wifiSsid, list);
         if (list.length === 0) {
           statusLine.textContent = '未扫描到可用 Wi-Fi，请手动输入 SSID。';
         } else {
-          statusLine.textContent = `已扫描到 ${list.length} 个 Wi-Fi，可直接选择。`;
+          statusLine.textContent = `已扫描到 ${list.length} 个 Wi-Fi，可选择或点击名称。`;
         }
       } catch {
-        statusLine.textContent = `Wi-Fi 扫描返回异常：${msg}`;
+        statusLine.textContent = `Wi-Fi 扫描返回异常: ${msg}`;
       }
     }
 
@@ -147,7 +261,7 @@
         body: JSON.stringify({ productId: id })
       });
       if (!verify.ok) {
-        statusLine.textContent = '产品ID校验失败：请扫描棋盘上的二维码后再继续。';
+        statusLine.textContent = '产品ID校验失败：请扫码棋盘二维码后重试。';
         return false;
       }
       return true;
@@ -164,13 +278,17 @@
 
       const d = await fetchJson(`/api/boards/${encodeURIComponent(id)}/status`);
       if (!d.ok) {
-        statusLine.textContent = '查询设备状态失败，默认进入配网流程：' + (d.error || 'unknown');
+        statusLine.textContent = `查询设备状态失败，默认进入配网流程: ${d.error || 'unknown'}`;
+        setProvisionModeUI();
         modal.classList.add('show');
         return;
       }
 
       if (forceProvision) {
-        statusLine.innerHTML = `<span class="badge offline">强制配网模式</span> 请连接蓝牙并填写 Wi-Fi`;
+        statusLine.innerHTML = isIOS
+          ? `<span class="badge offline">强制配网模式</span> 请连接 ESP32 热点后提交 Wi-Fi`
+          : `<span class="badge offline">强制配网模式</span> 请连接蓝牙并填写 Wi-Fi`;
+        setProvisionModeUI();
         modal.classList.add('show');
         return;
       }
@@ -182,7 +300,10 @@
         }, 500);
       } else {
         statusLine.innerHTML = `<span class="badge offline">设备离线</span> 请先配网`;
-        if (autoOpenModal) modal.classList.add('show');
+        if (autoOpenModal) {
+          setProvisionModeUI();
+          modal.classList.add('show');
+        }
       }
     }
 
@@ -192,8 +313,9 @@
       const ok = await verifyProduct(scannedId);
       if (!ok) return;
 
-      if (!navigator.bluetooth) {
-        alert('当前浏览器不支持 Web Bluetooth，请使用 Chrome(Android) 或桌面 Chromium。');
+      const reason = bleUnavailableReason();
+      if (reason) {
+        alert(reason);
         return;
       }
 
@@ -233,7 +355,35 @@
       await commandChar.writeValue(new TextEncoder().encode('SCAN_WIFI'));
     }
 
-    async function provision() {
+    async function scanWifiBySoftAP() {
+      const host = (softapHostEl.value || '192.168.4.1').trim();
+      if (!host) {
+        alert('请先填写 SoftAP Host');
+        return;
+      }
+      if (location.protocol === 'https:') {
+        statusLine.innerHTML = '<span class="badge offline">环境限制</span> HTTPS 页面不能直接请求 http://192.168.4.1，请改用 HTTP 页面或直接打开设备页。';
+        return;
+      }
+      statusLine.textContent = '正在通过 SoftAP 扫描 Wi-Fi...';
+      try {
+        const data = await fetchJson(`http://${host}/wifi-scan`);
+        if (!data.ok) {
+          throw new Error(data.error || 'scan failed');
+        }
+        const list = normalizeWifiList(data);
+        renderWifiChoices(iosWifiListSel, iosWifiListBox, iosWifiSsidEl, list);
+        if (list.length === 0) {
+          statusLine.textContent = '未扫描到可用 Wi-Fi，请手动输入 SSID。';
+        } else {
+          statusLine.textContent = `已扫描到 ${list.length} 个 Wi-Fi，可选择或点击名称。`;
+        }
+      } catch (err) {
+        statusLine.innerHTML = `<span class="badge offline">扫描失败</span> ${err.message || err}`;
+      }
+    }
+
+    async function provisionByBle() {
       const id = idEl.value.trim();
       const ssid = (wifiListSel.value || wifiSsid.value || '').trim();
       const password = wifiPwd.value;
@@ -256,7 +406,6 @@
       await provisionChar.writeValue(new TextEncoder().encode(payload));
       statusLine.innerHTML = `<span class="badge offline">已下发</span> 等待设备联网结果...`;
 
-      // Optional demo endpoint; ignore if backend doesn't provide it.
       try {
         await fetchJson('/api/device/provision', {
           method: 'POST',
@@ -266,14 +415,81 @@
       } catch (_) {}
     }
 
+    async function waitUntilOnline(retries = 24, delayMs = 2500) {
+      for (let i = 0; i < retries; i += 1) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        const id = idEl.value.trim();
+        const d = await fetchJson(`/api/boards/${encodeURIComponent(id)}/status`);
+        if (d && d.ok && d.online) {
+          statusLine.innerHTML = `<span class="badge online">设备在线</span> 正在进入棋盘页...`;
+          setTimeout(() => {
+            location.href = `/gamespace.html?productId=${encodeURIComponent(id)}`;
+          }, 500);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    async function provisionBySoftAP() {
+      const id = idEl.value.trim();
+      const host = (softapHostEl.value || '192.168.4.1').trim();
+      const ssid = (iosWifiListSel.value || iosWifiSsidEl.value || '').trim();
+      const password = iosWifiPwdEl.value || '';
+      if (!host || !ssid || !password) {
+        alert('请填写 SoftAP Host、Wi-Fi 名称和密码');
+        return;
+      }
+
+      const ok = await verifyProduct(id);
+      if (!ok) return;
+
+      statusLine.innerHTML = `<span class="badge offline">配网中</span> 正在向 ESP32 提交 Wi-Fi...`;
+      try {
+        const resp = await fetch(`http://${host}/provision`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: id,
+            ssid,
+            password,
+            backendUrl: window.location.origin
+          })
+        });
+        const text = await resp.text();
+        if (!resp.ok) {
+          throw new Error(text || `http-${resp.status}`);
+        }
+        statusLine.innerHTML = `<span class="badge offline">已下发</span> 等待设备连接路由器并上线...`;
+        const online = await waitUntilOnline();
+        if (!online) {
+          statusLine.innerHTML = `<span class="badge offline">等待超时</span> 请检查 Wi-Fi 密码后重试。`;
+        }
+      } catch (err) {
+        statusLine.innerHTML = `<span class="badge offline">SoftAP 配网失败</span> ${err.message || err}`;
+      }
+    }
+
     document.getElementById('checkBtn').onclick = () => checkStatus(true);
-    document.getElementById('provisionBtn').onclick = provision;
+    document.getElementById('provisionBtn').onclick = provisionByBle;
     document.getElementById('connectBleBtn').onclick = connectBle;
     document.getElementById('scanWifiBtn').onclick = scanWifiList;
+    document.getElementById('cancelBtn').onclick = () => modal.classList.remove('show');
+    document.getElementById('cancelBtnIos').onclick = () => modal.classList.remove('show');
+    document.getElementById('openSoftapBtn').onclick = () => {
+      const host = (softapHostEl.value || '192.168.4.1').trim();
+      window.open(`http://${host}/`, '_blank');
+    };
+    document.getElementById('iosScanWifiBtn').onclick = scanWifiBySoftAP;
+    document.getElementById('iosProvisionBtn').onclick = provisionBySoftAP;
+
     wifiListSel.onchange = () => {
       if (wifiListSel.value) wifiSsid.value = wifiListSel.value;
     };
-    document.getElementById('cancelBtn').onclick = () => modal.classList.remove('show');
+    iosWifiListSel.onchange = () => {
+      if (iosWifiListSel.value) iosWifiSsidEl.value = iosWifiListSel.value;
+    };
+
     document.getElementById('forceOnBtn').onclick = async () => {
       const id = idEl.value.trim();
       await fetchJson('/api/test/set-online', {
@@ -284,6 +500,7 @@
       checkStatus(false);
     };
 
+    setProvisionModeUI();
     checkStatus(true);
   </script>
 </body>

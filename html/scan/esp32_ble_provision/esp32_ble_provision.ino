@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <WebServer.h>
 #include <Preferences.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -22,6 +23,14 @@ BLECharacteristic* charWifiList = nullptr;
 
 String gDeviceId;
 String gFwVersion = "A1.0.0";
+String gSoftApSsid = "mTabula-Setup";
+WebServer gProvisionServer(80);
+
+void sendCors() {
+  gProvisionServer.sendHeader("Access-Control-Allow-Origin", "*");
+  gProvisionServer.sendHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  gProvisionServer.sendHeader("Access-Control-Allow-Headers", "Content-Type");
+}
 
 String getDeviceId() {
   uint64_t mac = ESP.getEfuseMac();
@@ -60,15 +69,38 @@ String jsonGet(const String& src, const char* key) {
   return src.substring(q1 + 1, q2);
 }
 
+String jsonEscape(const String& in) {
+  String out;
+  out.reserve(in.length() + 8);
+  for (size_t i = 0; i < in.length(); i++) {
+    char c = in.charAt(i);
+    if (c == '\\' || c == '"') {
+      out += '\\';
+      out += c;
+    } else if (c == '\n') {
+      out += "\\n";
+    } else if (c == '\r') {
+      out += "\\r";
+    } else if (c == '\t') {
+      out += "\\t";
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}
+
 void notifyStatus(const String& stage, const String& msg, const String& ip = "") {
   String payload = "{\"stage\":\"" + stage + "\",\"msg\":\"" + msg + "\",\"ip\":\"" + ip + "\"}";
-  charStatus->setValue(payload.c_str());
-  charStatus->notify();
+  if (charStatus) {
+    charStatus->setValue(payload.c_str());
+    charStatus->notify();
+  }
   Serial.println(payload);
 }
 
 bool connectWiFi(const String& ssid, const String& password, uint32_t timeoutMs = 20000) {
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
 
   uint32_t start = millis();
@@ -78,30 +110,109 @@ bool connectWiFi(const String& ssid, const String& password, uint32_t timeoutMs 
   return WiFi.status() == WL_CONNECTED;
 }
 
-void notifyWifiList() {
-  WiFi.mode(WIFI_STA);
+String wifiListJson(int maxItems, int maxBytes, bool includeOkField) {
+  WiFi.mode(WIFI_AP_STA);
   int n = WiFi.scanNetworks();
-  String payload = "{\"list\":[";
+  String payload = includeOkField ? "{\"ok\":true,\"list\":[" : "{\"list\":[";
   int count = 0;
   for (int i = 0; i < n; i++) {
     String ssid = WiFi.SSID(i);
     if (ssid.length() == 0) continue;
+    String item = "{\"ssid\":\"" + jsonEscape(ssid) + "\",\"rssi\":" + String(WiFi.RSSI(i)) + "}";
+    int extraComma = count > 0 ? 1 : 0;
+    if (maxBytes > 0 && (int)(payload.length() + extraComma + item.length() + 2) > maxBytes) break;
     if (count > 0) payload += ",";
-    payload += "{\"ssid\":\"" + ssid + "\",\"rssi\":" + String(WiFi.RSSI(i)) + "}";
+    payload += item;
     count++;
-    if (count >= 15) break; // keep payload small for BLE notification MTU
+    if (maxItems > 0 && count >= maxItems) break;
   }
   payload += "]}";
+  WiFi.scanDelete();
+  return payload;
+}
+
+void notifyWifiList() {
+  if (!charWifiList) return;
+  String payload = wifiListJson(6, 180, false);
   charWifiList->setValue(payload.c_str());
   charWifiList->notify();
 }
 
+void handleProvisionOptions() {
+  sendCors();
+  gProvisionServer.send(204);
+}
+
+void handleProvisionHealth() {
+  sendCors();
+  String body = "{\"ok\":true,\"deviceId\":\"" + gDeviceId + "\",\"apSsid\":\"" + gSoftApSsid + "\"}";
+  gProvisionServer.send(200, "application/json", body);
+}
+
+void handleProvisionRoot() {
+  sendCors();
+  String body = "mTabula SoftAP ready. POST /provision with JSON: {deviceId,ssid,password}";
+  gProvisionServer.send(200, "text/plain", body);
+}
+
+void handleWifiScan() {
+  sendCors();
+  gProvisionServer.send(200, "application/json", wifiListJson(20, 4096, true));
+}
+
+void handleProvisionPost() {
+  String raw = gProvisionServer.arg("plain");
+  String deviceId = jsonGet(raw, "deviceId");
+  String ssid = jsonGet(raw, "ssid");
+  String password = jsonGet(raw, "password");
+
+  if (deviceId.length() > 0 && deviceId != gDeviceId) {
+    sendCors();
+    gProvisionServer.send(400, "application/json", "{\"ok\":false,\"error\":\"device id mismatch\"}");
+    return;
+  }
+  if (ssid.length() == 0) {
+    sendCors();
+    gProvisionServer.send(400, "application/json", "{\"ok\":false,\"error\":\"missing ssid\"}");
+    return;
+  }
+
+  prefs.begin("wifi", false);
+  prefs.putString("ssid", ssid);
+  prefs.putString("pwd", password);
+  prefs.end();
+
+  notifyStatus("connecting", "wifi connecting");
+  bool ok = connectWiFi(ssid, password);
+  if (ok) {
+    notifyStatus("connected", "wifi connected", WiFi.localIP().toString());
+    sendCors();
+    gProvisionServer.send(200, "application/json", "{\"ok\":true,\"stage\":\"connected\"}");
+  } else {
+    notifyStatus("failed", "wifi connect failed");
+    sendCors();
+    gProvisionServer.send(500, "application/json", "{\"ok\":false,\"error\":\"wifi connect failed\"}");
+  }
+}
+
+void setupSoftApProvision() {
+  gSoftApSsid = "mTabula-" + gDeviceId.substring(gDeviceId.length() - 4);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(gSoftApSsid.c_str());
+  Serial.printf("SoftAP started: SSID=%s IP=%s\n", gSoftApSsid.c_str(), WiFi.softAPIP().toString().c_str());
+
+  gProvisionServer.on("/", HTTP_GET, handleProvisionRoot);
+  gProvisionServer.on("/health", HTTP_GET, handleProvisionHealth);
+  gProvisionServer.on("/wifi-scan", HTTP_GET, handleWifiScan);
+  gProvisionServer.on("/provision", HTTP_OPTIONS, handleProvisionOptions);
+  gProvisionServer.on("/provision", HTTP_POST, handleProvisionPost);
+  gProvisionServer.begin();
+}
+
 class ProvisionCallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value = characteristic->getValue();
-    if (value.empty()) return;
-
-    String s = String(value.c_str());
+    String s = characteristic->getValue();
+    if (s.length() == 0) return;
     String deviceId = jsonGet(s, "deviceId");
     String ssid = jsonGet(s, "ssid");
     String password = jsonGet(s, "password");
@@ -132,9 +243,8 @@ class ProvisionCallback : public BLECharacteristicCallbacks {
 
 class CommandCallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value = characteristic->getValue();
-    if (value.empty()) return;
-    String cmd = String(value.c_str());
+    String cmd = characteristic->getValue();
+    if (cmd.length() == 0) return;
     cmd.trim();
     cmd.toUpperCase();
     if (cmd == "SCAN_WIFI") {
@@ -209,6 +319,7 @@ void setup() {
   gDeviceId = getDeviceId();
   printDeviceInfoJson();
 
+  setupSoftApProvision();
   tryAutoReconnectWiFi();
   setupBLE();
 }
@@ -222,5 +333,6 @@ void loop() {
       printDeviceInfoJson();
     }
   }
+  gProvisionServer.handleClient();
   delay(200);
 }

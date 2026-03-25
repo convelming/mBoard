@@ -25,7 +25,7 @@
     <section class="card intro">
       <h1>Product ID 录入</h1>
       <p>命名规则：<code>MB + 型号 + 代际 + 产地 + C/V + N/H + 芯片 + 软件 + 年月 + 保留位 + 流水</code></p>
-      <p class="muted">示例：<code>MBP1SCNEA26030001</code></p>
+      <p class="muted">示例：<code>MBP1SCNEA2603000001</code></p>
       <p class="muted">建议先连接 ESP32 到电脑，点击“读取 ESP32 信息”自动填充硬件字段。</p>
     </section>
 
@@ -101,8 +101,8 @@
           <input name="reserved" id="reserved" value="00" maxlength="2" required />
         </label>
 
-        <label>流水号 (00-99)
-          <input name="serial" id="serial" value="01" maxlength="2" required />
+        <label>流水号 (0000-9999)
+          <input name="serial" id="serial" value="0001" maxlength="4" required />
         </label>
 
         <label>显示型号

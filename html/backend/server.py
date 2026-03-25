@@ -28,9 +28,10 @@ DATA_ROOT = PROJECT_ROOT / "data"
 WHITELIST_CSV = DATA_ROOT / "products.csv"
 ADMIN_USERS_CSV = DATA_ROOT / "admin_users.csv"
 PRODUCTS_ROOT = DATA_ROOT / "products"
+PUBLIC_BASE_URL = ""
 
 PRODUCT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{3,64}$")
-FULL_PRODUCT_ID_PATTERN = re.compile(r"^MB[A-Z0-9]{15}$")
+FULL_PRODUCT_ID_PATTERN = re.compile(r"^MB[A-Z0-9]{17}$")
 
 GAME_FIELDS = [
     "id",
@@ -301,6 +302,18 @@ def normalize_two_digits(value: Any, *, name: str, min_val: int = 0, max_val: in
     return raw
 
 
+def normalize_four_digits(value: Any, *, name: str, min_val: int = 0, max_val: int = 9999) -> str:
+    raw = str(value or "").strip()
+    if raw.isdigit() and len(raw) < 4:
+        raw = raw.zfill(4)
+    if not re.fullmatch(r"\d{4}", raw):
+        raise APIError(HTTPStatus.BAD_REQUEST, f"{name} must be 4 digits")
+    n = int(raw)
+    if n < min_val or n > max_val:
+        raise APIError(HTTPStatus.BAD_REQUEST, f"{name} out of range [{min_val}, {max_val}]")
+    return raw
+
+
 def normalize_optional_text(value: Any, *, max_len: int = 64) -> str:
     text = str(value or "").strip()
     if len(text) > max_len:
@@ -356,7 +369,7 @@ def make_product_id_from_body(body: Dict[str, Any]) -> Dict[str, str]:
     sw_code = normalize_code(body.get("swCode"), name="swCode")
     yy, mm = parse_yy_mm(body)
     reserved = normalize_two_digits(body.get("reserved") or "00", name="reserved")
-    serial = normalize_two_digits(body.get("serial"), name="serial")
+    serial = normalize_four_digits(body.get("serial"), name="serial")
 
     product_id = (
         f"MB{tier_code}{generation}{origin_code}{game_code}"
@@ -509,14 +522,24 @@ def append_product_to_whitelist(row: Dict[str, str]) -> None:
     write_product_table(merged_headers, rows)
 
 
-def board_access_info(host: str, product_id: str, proto: str = "http") -> Dict[str, str]:
+def board_access_info(
+    host: str,
+    product_id: str,
+    proto: str = "http",
+    public_base_url: str = "",
+) -> Dict[str, str]:
     # QR entry should start from scan/provision flow:
     # 1) verify product id
     # 2) check ESP32 online status
     # 3) if offline -> BLE Wi-Fi provisioning
     # 4) if online -> jump to board/game page
     path = f"/scan/public/scan.html?id={quote(product_id)}"
-    access_url = f"{proto}://{host}{path}"
+    base = (public_base_url or "").strip().rstrip("/")
+    if base and "://" not in base:
+        base = f"{proto}://{base}"
+    if not base:
+        base = f"{proto}://{host}"
+    access_url = f"{base}{path}"
     qr_url = (
         "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data="
         + quote(access_url, safe="")
@@ -899,6 +922,7 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
                     host=self.request_host(),
                     proto=self.request_proto(),
                     product_id=product_row["product_id"],
+                    public_base_url=PUBLIC_BASE_URL,
                 )
                 self.write_json(
                     HTTPStatus.OK,
@@ -925,6 +949,7 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
                     host=self.request_host(),
                     proto=self.request_proto(),
                     product_id=product_id,
+                    public_base_url=PUBLIC_BASE_URL,
                 )
                 self.write_json(
                     HTTPStatus.OK,
@@ -1197,10 +1222,14 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
             )
 
 
-def run_server(host: str, port: int) -> None:
+def run_server(host: str, port: int, public_base_url: str = "") -> None:
+    global PUBLIC_BASE_URL
+    PUBLIC_BASE_URL = (public_base_url or "").strip()
     ensure_data_layout()
     server = ThreadingHTTPServer((host, port), MTabulaHandler)
     print(f"mTabula Python backend running: http://{host}:{port}")
+    if PUBLIC_BASE_URL:
+        print(f"Public base URL: {PUBLIC_BASE_URL}")
     print(f"Project root: {PROJECT_ROOT}")
     print(f"Whitelist CSV: {WHITELIST_CSV}")
     print(f"Admin users CSV: {ADMIN_USERS_CSV}")
@@ -1211,9 +1240,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="mTabula Python backend")
     parser.add_argument("--host", default="0.0.0.0", help="bind host")
     parser.add_argument("--port", type=int, default=8866, help="bind port")
+    parser.add_argument(
+        "--public-base-url",
+        default=os.getenv("MTABULA_PUBLIC_BASE_URL", ""),
+        help="optional public base url used in accessUrl/qrUrl, e.g. http://192.168.1.10:8866",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    run_server(args.host, args.port)
+    run_server(args.host, args.port, args.public_base_url)

@@ -36,11 +36,19 @@
     L: 'mBoard-lite'
   };
 
-  function twoDigits(value) {
+  function fixedDigits(value, width, fallback) {
     var text = String(value || '').replace(/\D/g, '');
-    if (!text) return '00';
-    if (text.length === 1) return '0' + text;
-    return text.slice(-2);
+    if (!text) text = String(fallback || '').replace(/\D/g, '');
+    if (!text) text = '0';
+    return text.padStart(width, '0').slice(-width);
+  }
+
+  function twoDigits(value) {
+    return fixedDigits(value, 2, '00');
+  }
+
+  function fourDigits(value) {
+    return fixedDigits(value, 4, '0001');
   }
 
   function oneCode(value) {
@@ -57,12 +65,11 @@
   function serialFromDeviceId(deviceId) {
     var text = String(deviceId || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (!text) return '';
-    var tail = text.slice(-4);
-    var sum = 0;
-    for (var i = 0; i < tail.length; i += 1) {
-      sum += tail.charCodeAt(i);
+    var hash = 0;
+    for (var i = 0; i < text.length; i += 1) {
+      hash = ((hash * 131) + text.charCodeAt(i)) >>> 0;
     }
-    return String(sum % 100).padStart(2, '0');
+    return String(hash % 10000).padStart(4, '0');
   }
 
   function updateModelByTier() {
@@ -88,7 +95,7 @@
       oneCode(swEl.value) +
       yy + mm +
       twoDigits(reservedEl.value) +
-      twoDigits(serialEl.value);
+      fourDigits(serialEl.value);
 
     productIdEl.value = pid;
   }
@@ -131,7 +138,7 @@
       swCode: oneCode(swEl.value),
       productionMonth: monthEl.value,
       reserved: twoDigits(reservedEl.value),
-      serial: twoDigits(serialEl.value),
+      serial: fourDigits(serialEl.value),
       model: modelEl.value.trim(),
       active: !!activeEl.checked,
       productId: productIdEl.value,
