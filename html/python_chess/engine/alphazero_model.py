@@ -7,6 +7,8 @@ from .action_space import ACTION_SIZE
 
 
 class ResidualBlock(nn.Module):
+    """Standard 2-layer residual block used in AlphaZero-like towers."""
+
     def __init__(self, channels: int):
         super().__init__()
         self.c1 = nn.Conv2d(channels, channels, 3, padding=1, bias=False)
@@ -16,15 +18,31 @@ class ResidualBlock(nn.Module):
         self.act = nn.ReLU(inplace=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        r = x
+        shortcut = x
         x = self.act(self.b1(self.c1(x)))
         x = self.b2(self.c2(x))
-        return self.act(x + r)
+        return self.act(x + shortcut)
 
 
 class AlphaZeroNet(nn.Module):
+    """Policy-value network for 8x8 chess.
+
+    Input:
+        x: [B, 18, 8, 8]
+
+    Outputs:
+        policy_logits: [B, 4672]
+        value:         [B, 1], range [-1, 1] after tanh
+
+    Training targets:
+        policy target pi: [B, 4672] (MCTS visit distribution)
+        value target z:   [B, 1]    (game outcome from side-to-move view)
+    """
+
     def __init__(self, in_planes: int = 18, channels: int = 128, blocks: int = 6):
         super().__init__()
+
+        # Shared trunk.
         self.stem = nn.Sequential(
             nn.Conv2d(in_planes, channels, 3, padding=1, bias=False),
             nn.BatchNorm2d(channels),
@@ -32,12 +50,12 @@ class AlphaZeroNet(nn.Module):
         )
         self.tower = nn.Sequential(*[ResidualBlock(channels) for _ in range(blocks)])
 
-        # policy head
+        # Policy head -> logits over ACTION_SIZE=4672.
         self.p_conv = nn.Conv2d(channels, 32, 1, bias=False)
         self.p_bn = nn.BatchNorm2d(32)
         self.p_fc = nn.Linear(32 * 8 * 8, ACTION_SIZE)
 
-        # value head
+        # Value head -> scalar in [-1, 1].
         self.v_conv = nn.Conv2d(channels, 32, 1, bias=False)
         self.v_bn = nn.BatchNorm2d(32)
         self.v_fc1 = nn.Linear(32 * 8 * 8, 128)
@@ -51,11 +69,11 @@ class AlphaZeroNet(nn.Module):
 
         p = self.act(self.p_bn(self.p_conv(x)))
         p = p.flatten(1)
-        p = self.p_fc(p)
+        policy_logits = self.p_fc(p)
 
         v = self.act(self.v_bn(self.v_conv(x)))
         v = v.flatten(1)
         v = self.act(self.v_fc1(v))
-        v = torch.tanh(self.v_fc2(v))
+        value = torch.tanh(self.v_fc2(v))
 
-        return p, v
+        return policy_logits, value

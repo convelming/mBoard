@@ -16,6 +16,15 @@ from engine.mcts import MCTS
 from engine.rules import ChessRules
 from engine.train import AlphaZeroTrainer, TrainConfig
 
+"""FastAPI service for AlphaZero chess training and inference.
+
+Primary endpoints:
+- POST /api/train/start : start asynchronous self-play training loop
+- GET  /api/train/status: poll training state and event history
+- POST /api/play/move   : apply optional human move, then return AI move
+- WS   /ws/train        : push training events in real time
+"""
+
 app = FastAPI(title="mTabula AlphaZero Chess API")
 app.add_middleware(
     CORSMiddleware,
@@ -32,9 +41,11 @@ class TrainStartReq(BaseModel):
     sims: int = 48
     epochs: int = 2
     batch_size: int = 64
+    checkpoint_every_epochs: int = 10
 
 
 class PlayReq(BaseModel):
+    # Input position in FEN, plus optional human move in UCI.
     fen: str
     human_move_uci: Optional[str] = None
     sims: int = 64
@@ -98,6 +109,8 @@ def append_train_event(ev: dict):
 async def on_startup():
     global main_loop
     main_loop = asyncio.get_running_loop()
+    # Ensure API play endpoint uses the latest trained weights on service boot.
+    maybe_load_latest(Path(__file__).resolve().parents[1] / "checkpoints")
 
 
 @app.get("/api/health")
@@ -132,6 +145,7 @@ def start_train(req: TrainStartReq):
             epochs=req.epochs,
             batch_size=req.batch_size,
             out_dir=str(Path(__file__).resolve().parents[1] / "checkpoints"),
+            checkpoint_every_epochs=max(1, req.checkpoint_every_epochs),
         )
         trainer = AlphaZeroTrainer(cfg)
         try:
