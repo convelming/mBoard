@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mTabula AlphaZero 训练监控</title>
+  <link rel="stylesheet" href="./az.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h2>AlphaZero 训练监控</h2>
+    <a href="./play.html">进入人机对弈</a>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <h3>训练参数</h3>
+      <div class="row">
+        <div>
+          <label>迭代数 iters</label>
+          <input id="iters" type="number" value="6" min="1" max="500" />
+        </div>
+        <div>
+          <label>每迭代自博弈局数</label>
+          <input id="games" type="number" value="3" min="1" max="200" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>MCTS模拟数 sims</label>
+          <input id="sims" type="number" value="48" min="8" max="400" />
+        </div>
+        <div>
+          <label>训练 epochs</label>
+          <input id="epochs" type="number" value="2" min="1" max="20" />
+        </div>
+      </div>
+      <label>batch_size</label>
+      <input id="batch" type="number" value="64" min="16" max="2048" />
+
+      <div class="row" style="margin-top:10px">
+        <button id="startBtn">开始训练</button>
+        <button id="refreshBtn" class="secondary">刷新状态</button>
+      </div>
+
+      <h3 style="margin-top:12px">服务状态</h3>
+      <div class="kv">
+        <div>API</div><div id="apiState">-</div>
+        <div>运行中</div><div id="runState">-</div>
+        <div>最新事件</div><div id="lastEvent">-</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>训练日志</h3>
+      <div id="log" class="log"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8899';
+const logEl = document.getElementById('log');
+
+function appendLog(line) {
+  const row = document.createElement('div');
+  row.textContent = `[${new Date().toLocaleTimeString()}] ${line}`;
+  logEl.appendChild(row);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function renderHistory(history = []) {
+  logEl.innerHTML = '';
+  history.slice(-150).forEach(ev => appendLog(JSON.stringify(ev)));
+}
+
+async function refreshStatus() {
+  try {
+    const h = await fetch(`${API}/api/health`).then(r => r.json());
+    document.getElementById('apiState').textContent = h.ok ? '在线' : '异常';
+
+    const st = await fetch(`${API}/api/train/status`).then(r => r.json());
+    document.getElementById('runState').textContent = st.running ? '是' : '否';
+    document.getElementById('lastEvent').textContent = st.last ? JSON.stringify(st.last) : '-';
+    renderHistory(st.history || []);
+  } catch (e) {
+    document.getElementById('apiState').textContent = `离线: ${e.message}`;
+  }
+}
+
+document.getElementById('refreshBtn').onclick = refreshStatus;
+
+document.getElementById('startBtn').onclick = async () => {
+  const payload = {
+    iters: Number(document.getElementById('iters').value),
+    games_per_iter: Number(document.getElementById('games').value),
+    sims: Number(document.getElementById('sims').value),
+    epochs: Number(document.getElementById('epochs').value),
+    batch_size: Number(document.getElementById('batch').value),
+  };
+  try {
+    const res = await fetch(`${API}/api/train/start`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    }).then(r => r.json());
+    appendLog(`start: ${JSON.stringify(res)}`);
+    refreshStatus();
+  } catch (e) {
+    appendLog(`start error: ${e.message}`);
+  }
+};
+
+setInterval(refreshStatus, 3000);
+refreshStatus();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mTabula 人机对弈</title>
+  <link rel="stylesheet" href="../css/chessboard-1.0.0.min.css" />
+  <link rel="stylesheet" href="./az.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h2>mTabula 人机对弈（AlphaZero）</h2>
+    <a href="./train.html">查看训练监控</a>
+  </div>
+
+  <div class="grid2">
+    <section class="card">
+      <h3>对局设置</h3>
+      <label>人类执子</label>
+      <select id="humanSide">
+        <option value="w">白方</option>
+        <option value="b">黑方</option>
+      </select>
+
+      <label>MCTS sims（AI强度）</label>
+      <input id="sims" type="number" value="64" min="8" max="400" />
+
+      <div class="row" style="margin-top:10px">
+        <button id="newGameBtn">新对局</button>
+        <button id="undoBtn" class="secondary">悔一步</button>
+      </div>
+
+      <h3 style="margin-top:12px">局面信息</h3>
+      <div class="kv">
+        <div>当前回合</div><div id="turn">-</div>
+        <div>结果</div><div id="result">*（进行中）</div>
+        <div>FEN</div><div id="fen" style="word-break: break-all;">-</div>
+      </div>
+
+      <h3 style="margin-top:12px">历史</h3>
+      <div id="history" class="log" style="height:220px;"></div>
+    </section>
+
+    <section class="card">
+      <div class="board-wrap">
+        <div id="board"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="../js/jquery-3.7.1.min.js"></script>
+<script src="../js/chess.js"></script>
+<script src="../js/chessboard-1.0.0.min.js"></script>
+<script>
+const API = 'http://127.0.0.1:8899';
+const game = new Chess();
+let humanSide = 'w';
+let board = null;
+
+function addHistory(line) {
+  const el = document.getElementById('history');
+  const row = document.createElement('div');
+  row.textContent = line;
+  el.appendChild(row);
+  el.scrollTop = el.scrollHeight;
+}
+
+function refreshInfo(result='*') {
+  document.getElementById('turn').textContent = game.turn() === 'w' ? '白方' : '黑方';
+  document.getElementById('fen').textContent = game.fen();
+  document.getElementById('result').textContent = result === '*' ? '*（进行中）' : result;
+}
+
+async function aiMoveAfter(fenBefore, humanMoveUci = null) {
+  try {
+    const payload = {
+      fen: fenBefore,
+      human_move_uci: humanMoveUci,
+      sims: Number(document.getElementById('sims').value),
+    };
+
+    const res = await fetch(`${API}/api/play/move`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    }).then(r => r.json());
+
+    if (!res.ok) {
+      addHistory(`后端错误: ${res.error}`);
+      board.position(game.fen(), false);
+      refreshInfo();
+      return;
+    }
+
+    game.load(res.fen);
+    board.position(game.fen(), false);
+    if (humanMoveUci) addHistory(`你: ${humanMoveUci}`);
+    if (res.ai_move) addHistory(`AI: ${res.ai_move}`);
+    refreshInfo(res.result || '*');
+  } catch (e) {
+    addHistory(`请求失败: ${e.message}`);
+  }
+}
+
+function onDragStart(source, piece) {
+  if (game.game_over()) return false;
+  const isWhitePiece = piece.startsWith('w');
+  if ((game.turn() === 'w') !== isWhitePiece) return false;
+  if (game.turn() !== humanSide) return false;
+}
+
+function onDrop(source, target) {
+  const fenBefore = game.fen();
+  const move = game.move({from: source, to: target, promotion: 'q'});
+  if (move === null) return 'snapback';
+
+  // rollback local first; server is source of truth
+  game.undo();
+  const uci = `${source}${target}${move.promotion ? move.promotion : ''}`;
+  aiMoveAfter(fenBefore, uci);
+}
+
+function initBoard() {
+  board = Chessboard('board', {
+    draggable: true,
+    position: 'start',
+    orientation: humanSide === 'w' ? 'white' : 'black',
+    onDragStart,
+    onDrop,
+    moveSpeed: 'fast',
+    snapbackSpeed: 150,
+  });
+  refreshInfo();
+}
+
+document.getElementById('humanSide').addEventListener('change', () => {
+  humanSide = document.getElementById('humanSide').value;
+  board.orientation(humanSide === 'w' ? 'white' : 'black');
+});
+
+document.getElementById('newGameBtn').addEventListener('click', () => {
+  game.reset();
+  document.getElementById('history').innerHTML = '';
+  board.start(false);
+  refreshInfo();
+  if (humanSide === 'b') aiMoveAfter(game.fen(), null);
+});
+
+document.getElementById('undoBtn').addEventListener('click', () => {
+  const a = game.undo();
+  const b = game.undo();
+  if (a || b) {
+    board.position(game.fen(), false);
+    refreshInfo();
+    addHistory('执行悔棋');
+  }
+});
+
+initBoard();
+if (humanSide === 'b') aiMoveAfter(game.fen(), null);
+</script>
+</body>
+</html>
