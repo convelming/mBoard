@@ -1,0 +1,1111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd">
+
+<pdf2xml producer="poppler" version="24.04.0">
+<page number="1" position="absolute" top="0" left="0" height="900" width="1273">
+	<fontspec id="0" size="7" family="Arial" color="#000000"/>
+	<fontspec id="1" size="7" family="Arial" color="#000000"/>
+	<fontspec id="2" size="7" family="Arial" color="#000080"/>
+	<fontspec id="3" size="7" family="Arial" color="#0000ff"/>
+<text top="388" left="430" width="11" height="6" font="0">VIN</text>
+<text top="382" left="422" width="4" height="6" font="0">1</text>
+<text top="415" left="506" width="19" height="6" font="0">VOUT</text>
+<text top="409" left="529" width="4" height="6" font="0">2</text>
+<text top="423" left="463" width="0" height="6" font="1">GND</text>
+<text top="431" left="457" width="0" height="6" font="1">3</text>
+<text top="361" left="516" width="9" height="6" font="0">FB</text>
+<text top="355" left="529" width="4" height="6" font="0">4</text>
+<text top="423" left="495" width="0" height="6" font="1">ON/OFF</text>
+<text top="431" left="490" width="0" height="6" font="1">5</text>
+<text top="388" left="512" width="13" height="6" font="0">TAB</text>
+<text top="382" left="529" width="4" height="6" font="0">6</text>
+<text top="317" left="426" width="9" height="6" font="2">U1</text>
+<text top="327" left="426" width="29" height="6" font="2">TO-263-5</text>
+<text top="338" left="426" width="50" height="6" font="3">AP1501S-5.0RG</text>
+<text top="406" left="249" width="20" height="6" font="2">+P12V</text>
+<text top="463" left="564" width="0" height="6" font="1">2</text>
+<text top="416" left="564" width="0" height="6" font="1">1</text>
+<text top="441" left="566" width="9" height="6" font="2">D1</text>
+<text top="452" left="566" width="24" height="6" font="3">1N5822</text>
+<text top="419" left="259" width="9" height="6" font="2">C1</text>
+<text top="430" left="259" width="19" height="6" font="3">470uF</text>
+<text top="419" left="318" width="9" height="6" font="2">C2</text>
+<text top="441" left="318" width="20" height="6" font="2">C1206</text>
+<text top="430" left="318" width="12" height="6" font="3">1uF</text>
+<text top="419" left="367" width="9" height="6" font="2">C3</text>
+<text top="441" left="367" width="20" height="6" font="2">C0603</text>
+<text top="430" left="367" width="19" height="6" font="3">100nF</text>
+<text top="380" left="154" width="4" height="6" font="0">4</text>
+<text top="359" left="191" width="4" height="6" font="0">3</text>
+<text top="380" left="191" width="4" height="6" font="0">2</text>
+<text top="402" left="191" width="4" height="6" font="0">1</text>
+<text top="338" left="156" width="15" height="6" font="2">SW1</text>
+<text top="349" left="156" width="63" height="6" font="3">MSS12C02LS-BB2.0</text>
+<text top="403" left="577" width="8" height="6" font="2">L1</text>
+<text top="403" left="593" width="16" height="6" font="3">33uH</text>
+<text top="430" left="696" width="9" height="6" font="2">C6</text>
+<text top="441" left="696" width="19" height="6" font="3">330uF</text>
+<text top="430" left="642" width="9" height="6" font="2">C4</text>
+<text top="452" left="642" width="20" height="6" font="2">C0603</text>
+<text top="441" left="642" width="19" height="6" font="3">100nF</text>
+<text top="458" left="175" width="4" height="6" font="0">1</text>
+<text top="453" left="184" width="4" height="6" font="0">1</text>
+<text top="469" left="175" width="4" height="6" font="0">2</text>
+<text top="463" left="184" width="4" height="6" font="0">2</text>
+<text top="441" left="156" width="13" height="6" font="2">CN1</text>
+<text top="489" left="156" width="67" height="6" font="3">WJ15EDGVC-3.81-2P</text>
+<text top="403" left="887" width="7" height="6" font="0">IN</text>
+<text top="399" left="876" width="4" height="6" font="0">1</text>
+<text top="424" left="887" width="15" height="6" font="0">GND</text>
+<text top="420" left="876" width="4" height="6" font="0">2</text>
+<text top="446" left="887" width="9" height="6" font="0">EN</text>
+<text top="442" left="876" width="4" height="6" font="0">3</text>
+<text top="435" left="923" width="14" height="6" font="0">BYP</text>
+<text top="431" left="944" width="4" height="6" font="0">4</text>
+<text top="414" left="923" width="14" height="6" font="0">OUT</text>
+<text top="409" left="944" width="4" height="6" font="0">5</text>
+<text top="376" left="885" width="9" height="6" font="2">U2</text>
+<text top="484" left="831" width="115" height="6" font="2">SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL</text>
+<text top="473" left="831" width="67" height="6" font="3">SPX3819M5-L-3-3/TR</text>
+<text top="435" left="761" width="9" height="6" font="2">C5</text>
+<text top="457" left="761" width="20" height="6" font="2">C0805</text>
+<text top="446" left="761" width="12" height="6" font="3">1uF</text>
+<text top="435" left="1025" width="9" height="6" font="2">C7</text>
+<text top="457" left="1025" width="20" height="6" font="2">C0805</text>
+<text top="446" left="1025" width="46" height="6" font="3">4.7uF/50V/X7R</text>
+<text top="371" left="1004" width="21" height="6" font="2">+U3V3</text>
+<text top="441" left="1133" width="17" height="6" font="2">LED1</text>
+<text top="462" left="1133" width="39" height="6" font="2">LED0603-FD</text>
+<text top="452" left="1133" width="41" height="6" font="3">GL0603UR01</text>
+<text top="371" left="784" width="18" height="6" font="2">+M5V</text>
+<text top="376" left="671" width="18" height="6" font="2">+M5V</text>
+<text top="392" left="1123" width="9" height="6" font="2">R1</text>
+<text top="403" left="1123" width="7" height="6" font="3">1k</text>
+<text top="354" left="1103" width="18" height="6" font="2">+M5V</text>
+</page>
+<page number="2" position="absolute" top="0" left="0" height="900" width="1273">
+	<fontspec id="4" size="7" family="Arial" color="#0000ff"/>
+<text top="301" left="774" width="15" height="6" font="0">GND</text>
+<text top="296" left="794" width="8" height="6" font="0">41</text>
+<text top="312" left="774" width="15" height="6" font="0">GND</text>
+<text top="307" left="794" width="8" height="6" font="0">40</text>
+<text top="323" left="778" width="11" height="6" font="0">IO1</text>
+<text top="318" left="794" width="8" height="6" font="0">39</text>
+<text top="334" left="778" width="11" height="6" font="0">IO2</text>
+<text top="328" left="794" width="8" height="6" font="0">38</text>
+<text top="345" left="772" width="17" height="6" font="0">TXD0</text>
+<text top="339" left="794" width="8" height="6" font="0">37</text>
+<text top="355" left="771" width="18" height="6" font="0">RXD0</text>
+<text top="350" left="794" width="8" height="6" font="0">36</text>
+<text top="366" left="775" width="15" height="6" font="0">IO42</text>
+<text top="361" left="794" width="8" height="6" font="0">35</text>
+<text top="377" left="775" width="15" height="6" font="0">IO41</text>
+<text top="372" left="794" width="8" height="6" font="0">34</text>
+<text top="388" left="775" width="15" height="6" font="0">IO40</text>
+<text top="382" left="794" width="8" height="6" font="0">33</text>
+<text top="399" left="775" width="15" height="6" font="0">IO39</text>
+<text top="393" left="794" width="8" height="6" font="0">32</text>
+<text top="409" left="775" width="15" height="6" font="0">IO38</text>
+<text top="404" left="794" width="8" height="6" font="0">31</text>
+<text top="420" left="775" width="15" height="6" font="0">IO37</text>
+<text top="415" left="794" width="8" height="6" font="0">30</text>
+<text top="431" left="775" width="15" height="6" font="0">IO36</text>
+<text top="426" left="794" width="8" height="6" font="0">29</text>
+<text top="442" left="775" width="15" height="6" font="0">IO35</text>
+<text top="436" left="794" width="8" height="6" font="0">28</text>
+<text top="453" left="778" width="11" height="6" font="0">IO0</text>
+<text top="447" left="794" width="8" height="6" font="0">27</text>
+<text top="489" left="779" width="0" height="6" font="1">IO45</text>
+<text top="502" left="774" width="0" height="6" font="1">26</text>
+<text top="489" left="769" width="0" height="6" font="1">IO48</text>
+<text top="502" left="763" width="0" height="6" font="1">25</text>
+<text top="489" left="758" width="0" height="6" font="1">IO47</text>
+<text top="502" left="752" width="0" height="6" font="1">24</text>
+<text top="489" left="747" width="0" height="6" font="1">IO21</text>
+<text top="502" left="742" width="0" height="6" font="1">23</text>
+<text top="489" left="736" width="0" height="6" font="1">IO14</text>
+<text top="502" left="731" width="0" height="6" font="1">22</text>
+<text top="489" left="725" width="0" height="6" font="1">IO13</text>
+<text top="502" left="720" width="0" height="6" font="1">21</text>
+<text top="489" left="715" width="0" height="6" font="1">IO12</text>
+<text top="502" left="709" width="0" height="6" font="1">20</text>
+<text top="489" left="704" width="0" height="6" font="1">IO11</text>
+<text top="502" left="698" width="0" height="6" font="1">19</text>
+<text top="489" left="693" width="0" height="6" font="1">IO10</text>
+<text top="502" left="688" width="0" height="6" font="1">18</text>
+<text top="489" left="682" width="0" height="6" font="1">IO9</text>
+<text top="502" left="677" width="0" height="6" font="1">17</text>
+<text top="489" left="671" width="0" height="6" font="1">IO46</text>
+<text top="502" left="666" width="0" height="6" font="1">16</text>
+<text top="489" left="661" width="0" height="6" font="1">IO3</text>
+<text top="502" left="655" width="0" height="6" font="1">15</text>
+<text top="453" left="646" width="15" height="6" font="0">IO20</text>
+<text top="447" left="634" width="8" height="6" font="0">14</text>
+<text top="442" left="646" width="15" height="6" font="0">IO19</text>
+<text top="436" left="634" width="8" height="6" font="0">13</text>
+<text top="431" left="646" width="11" height="6" font="0">IO8</text>
+<text top="426" left="634" width="8" height="6" font="0">12</text>
+<text top="420" left="646" width="15" height="6" font="0">IO18</text>
+<text top="415" left="634" width="8" height="6" font="0">11</text>
+<text top="409" left="646" width="15" height="6" font="0">IO17</text>
+<text top="404" left="634" width="8" height="6" font="0">10</text>
+<text top="399" left="646" width="15" height="6" font="0">IO16</text>
+<text top="393" left="638" width="4" height="6" font="0">9</text>
+<text top="388" left="646" width="15" height="6" font="0">IO15</text>
+<text top="382" left="638" width="4" height="6" font="0">8</text>
+<text top="377" left="646" width="11" height="6" font="0">IO7</text>
+<text top="372" left="638" width="4" height="6" font="0">7</text>
+<text top="366" left="646" width="11" height="6" font="0">IO6</text>
+<text top="361" left="638" width="4" height="6" font="0">6</text>
+<text top="355" left="646" width="11" height="6" font="0">IO5</text>
+<text top="350" left="638" width="4" height="6" font="0">5</text>
+<text top="345" left="646" width="11" height="6" font="0">IO4</text>
+<text top="339" left="638" width="4" height="6" font="0">4</text>
+<text top="334" left="646" width="9" height="6" font="0">EN</text>
+<text top="328" left="638" width="4" height="6" font="0">3</text>
+<text top="323" left="646" width="12" height="6" font="0">3V3</text>
+<text top="318" left="638" width="4" height="6" font="0">2</text>
+<text top="312" left="646" width="15" height="6" font="0">GND</text>
+<text top="307" left="638" width="4" height="6" font="0">1</text>
+<text top="284" left="642" width="9" height="6" font="2">U3</text>
+<text top="284" left="685" width="90" height="6" font="3">ESP32-S3-WROOM-1-N16R2</text>
+<text top="344" left="507" width="9" height="6" font="2">R5</text>
+<text top="365" left="507" width="20" height="6" font="2">R0603</text>
+<text top="354" left="507" width="11" height="6" font="3">10k</text>
+<text top="408" left="507" width="12" height="6" font="2">C10</text>
+<text top="430" left="507" width="20" height="6" font="2">C0603</text>
+<text top="419" left="507" width="12" height="6" font="3">1uF</text>
+<text top="327" left="599" width="18" height="6" font="3">RSTS</text>
+<text top="344" left="458" width="9" height="6" font="2">C9</text>
+<text top="365" left="458" width="20" height="6" font="2">C0603</text>
+<text top="354" left="458" width="19" height="6" font="3">100nF</text>
+<text top="561" left="923" width="4" height="6" font="0">1</text>
+<text top="561" left="962" width="4" height="6" font="0">2</text>
+<text top="549" left="934" width="15" height="6" font="2">SW3</text>
+<text top="576" left="928" width="30" height="6" font="3">ST-1185S</text>
+<text top="560" left="993" width="19" height="6" font="3">BOOT</text>
+<text top="592" left="950" width="12" height="6" font="2">C15</text>
+<text top="614" left="950" width="20" height="6" font="2">C0603</text>
+<text top="603" left="950" width="19" height="6" font="3">100nF</text>
+<text top="446" left="809" width="19" height="6" font="3">BOOT</text>
+<text top="338" left="804" width="22" height="6" font="3">U0TXD</text>
+<text top="349" left="804" width="23" height="6" font="3">U0RXD</text>
+<text top="349" left="599" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="360" left="599" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="371" left="599" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="561" left="1080" width="4" height="6" font="0">1</text>
+<text top="561" left="1118" width="4" height="6" font="0">2</text>
+<text top="549" left="1090" width="15" height="6" font="2">SW4</text>
+<text top="576" left="1085" width="30" height="6" font="3">ST-1185S</text>
+<text top="560" left="1150" width="18" height="6" font="3">RSTS</text>
+<text top="592" left="1106" width="12" height="6" font="2">C16</text>
+<text top="614" left="1106" width="20" height="6" font="2">C0603</text>
+<text top="603" left="1106" width="19" height="6" font="3">100nF</text>
+<text top="344" left="421" width="9" height="6" font="2">C8</text>
+<text top="365" left="421" width="20" height="6" font="2">C0603</text>
+<text top="354" left="421" width="15" height="6" font="3">10uF</text>
+<text top="295" left="437" width="21" height="6" font="2">+U3V3</text>
+<text top="171" left="131" width="9" height="6" font="0">EH</text>
+<text top="166" left="125" width="4" height="6" font="0">6</text>
+<text top="192" left="152" width="15" height="6" font="0">GND</text>
+<text top="188" left="172" width="4" height="6" font="0">5</text>
+<text top="181" left="160" width="7" height="6" font="0">ID</text>
+<text top="177" left="172" width="4" height="6" font="0">4</text>
+<text top="171" left="158" width="9" height="6" font="0">D+</text>
+<text top="166" left="172" width="4" height="6" font="0">3</text>
+<text top="160" left="160" width="7" height="6" font="0">D-</text>
+<text top="156" left="172" width="4" height="6" font="0">2</text>
+<text top="149" left="153" width="14" height="6" font="0">VCC</text>
+<text top="145" left="172" width="4" height="6" font="0">1</text>
+<text top="133" left="129" width="18" height="6" font="2">USB1</text>
+<text top="209" left="129" width="46" height="6" font="3">MICRO 4P DIP</text>
+<text top="144" left="183" width="18" height="6" font="3">VUSB</text>
+<text top="165" left="183" width="14" height="6" font="3">UD+</text>
+<text top="155" left="183" width="12" height="6" font="3">UD-</text>
+<text top="517" left="230" width="12" height="6" font="0">VIO</text>
+<text top="512" left="222" width="4" height="6" font="0">1</text>
+<text top="528" left="230" width="15" height="6" font="0">GND</text>
+<text top="523" left="222" width="4" height="6" font="0">2</text>
+<text top="539" left="230" width="18" height="6" font="0">VDD5</text>
+<text top="534" left="222" width="4" height="6" font="0">3</text>
+<text top="550" left="230" width="13" height="6" font="0">TXD</text>
+<text top="544" left="222" width="4" height="6" font="0">4</text>
+<text top="561" left="230" width="14" height="6" font="0">RXD</text>
+<text top="555" left="222" width="4" height="6" font="0">5</text>
+<text top="571" left="230" width="8" height="6" font="0">V3</text>
+<text top="566" left="222" width="4" height="6" font="0">6</text>
+<text top="582" left="230" width="14" height="6" font="0">UD+</text>
+<text top="577" left="222" width="4" height="6" font="0">7</text>
+<text top="593" left="230" width="12" height="6" font="0">UD-</text>
+<text top="588" left="222" width="4" height="6" font="0">8</text>
+<text top="593" left="301" width="18" height="6" font="0">VBUS</text>
+<text top="588" left="324" width="4" height="6" font="0">9</text>
+<text top="582" left="302" width="17" height="6" font="0">ACT#</text>
+<text top="577" left="324" width="8" height="6" font="0">10</text>
+<text top="571" left="305" width="15" height="6" font="0">DCD</text>
+<text top="566" left="324" width="8" height="6" font="0">11</text>
+<text top="561" left="285" width="34" height="6" font="0">DTRTNOW</text>
+<text top="555" left="324" width="8" height="6" font="0">12</text>
+<text top="550" left="306" width="13" height="6" font="0">RTS</text>
+<text top="544" left="324" width="8" height="6" font="0">13</text>
+<text top="539" left="305" width="14" height="6" font="0">DSR</text>
+<text top="534" left="324" width="8" height="6" font="0">14</text>
+<text top="528" left="306" width="13" height="6" font="0">CTS</text>
+<text top="523" left="324" width="8" height="6" font="0">15</text>
+<text top="517" left="313" width="7" height="6" font="0">RI</text>
+<text top="512" left="324" width="8" height="6" font="0">16</text>
+<text top="515" left="276" width="0" height="6" font="1">EP</text>
+<text top="504" left="272" width="0" height="6" font="1">17</text>
+<text top="500" left="226" width="9" height="6" font="2">U6</text>
+<text top="608" left="226" width="26" height="6" font="3">CH343P</text>
+<text top="538" left="59" width="12" height="6" font="2">C11</text>
+<text top="560" left="59" width="20" height="6" font="2">C0603</text>
+<text top="549" left="59" width="12" height="6" font="3">1uF</text>
+<text top="489" left="81" width="21" height="6" font="2">+U3V3</text>
+<text top="554" left="107" width="12" height="6" font="2">C12</text>
+<text top="576" left="107" width="20" height="6" font="2">C0603</text>
+<text top="565" left="107" width="12" height="6" font="3">1uF</text>
+<text top="533" left="140" width="18" height="6" font="3">VUSB</text>
+<text top="543" left="172" width="23" height="6" font="3">U0RXD</text>
+<text top="554" left="172" width="22" height="6" font="3">U0TXD</text>
+<text top="587" left="151" width="12" height="6" font="2">C13</text>
+<text top="608" left="151" width="20" height="6" font="2">C0603</text>
+<text top="597" left="151" width="19" height="6" font="3">100nF</text>
+<text top="576" left="194" width="14" height="6" font="3">UD+</text>
+<text top="587" left="194" width="12" height="6" font="3">UD-</text>
+<text top="133" left="226" width="9" height="6" font="2">D2</text>
+<text top="165" left="226" width="30" height="6" font="3">1N4148W</text>
+<text top="149" left="288" width="17" height="6" font="2">+U5V</text>
+<text top="587" left="340" width="18" height="6" font="3">VUSB</text>
+<text top="543" left="340" width="13" height="6" font="3">RTS</text>
+<text top="554" left="340" width="14" height="6" font="3">DTR</text>
+<text top="684" left="140" width="17" height="6" font="2">LED5</text>
+<text top="684" left="167" width="41" height="6" font="3">GL0603UB01</text>
+<text top="727" left="140" width="17" height="6" font="2">LED6</text>
+<text top="727" left="167" width="53" height="6" font="3">LTST-C191KSKT</text>
+<text top="657" left="232" width="9" height="6" font="2">R8</text>
+<text top="678" left="232" width="7" height="6" font="3">1k</text>
+<text top="700" left="232" width="9" height="6" font="2">R9</text>
+<text top="722" left="232" width="7" height="6" font="3">1k</text>
+<text top="668" left="297" width="21" height="6" font="2">+U3V3</text>
+<text top="711" left="297" width="21" height="6" font="2">+U3V3</text>
+<text top="705" left="113" width="22" height="6" font="3">U0TXD</text>
+<text top="662" left="113" width="23" height="6" font="3">U0RXD</text>
+<text top="290" left="215" width="9" height="6" font="2">Q1</text>
+<text top="306" left="215" width="116" height="6" font="2">SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR</text>
+<text top="322" left="215" width="87" height="6" font="3">SS8050-G(RANGE:120-200)</text>
+<text top="273" left="221" width="18" height="6" font="3">RSTS</text>
+<text top="300" left="145" width="9" height="6" font="2">R4</text>
+<text top="322" left="145" width="20" height="6" font="2">R0603</text>
+<text top="333" left="145" width="11" height="6" font="3">10k</text>
+<text top="306" left="102" width="14" height="6" font="3">DTR</text>
+<text top="387" left="145" width="9" height="6" font="2">R6</text>
+<text top="408" left="145" width="20" height="6" font="2">R0603</text>
+<text top="419" left="145" width="11" height="6" font="3">10k</text>
+<text top="392" left="102" width="13" height="6" font="3">RTS</text>
+<text top="435" left="221" width="19" height="6" font="3">BOOT</text>
+<text top="376" left="215" width="9" height="6" font="2">Q2</text>
+<text top="392" left="215" width="116" height="6" font="2">SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR</text>
+<text top="408" left="215" width="87" height="6" font="3">SS8050-G(RANGE:120-200)</text>
+<text top="182" left="453" width="17" height="6" font="2">LED3</text>
+<text top="203" left="453" width="68" height="6" font="2">LED0603-RD_GREEN</text>
+<text top="192" left="453" width="50" height="6" font="3">XL-1608PGC-06</text>
+<text top="338" left="599" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="425" left="599" width="11" height="6" font="3">PDI</text>
+<text top="535" left="678" width="0" height="6" font="4">MS10</text>
+<text top="535" left="689" width="0" height="6" font="4">MS20</text>
+<text top="535" left="699" width="0" height="6" font="4">MS30</text>
+<text top="535" left="710" width="0" height="6" font="4">MS11</text>
+<text top="535" left="721" width="0" height="6" font="4">MS21</text>
+<text top="535" left="732" width="0" height="6" font="4">MS31</text>
+<text top="535" left="743" width="0" height="6" font="4">FRC</text>
+<text top="366" left="867" width="4" height="6" font="0">1</text>
+<text top="361" left="859" width="4" height="6" font="0">1</text>
+<text top="377" left="867" width="4" height="6" font="0">2</text>
+<text top="372" left="859" width="4" height="6" font="0">2</text>
+<text top="388" left="867" width="4" height="6" font="0">3</text>
+<text top="382" left="859" width="4" height="6" font="0">3</text>
+<text top="399" left="867" width="4" height="6" font="0">4</text>
+<text top="393" left="859" width="4" height="6" font="0">4</text>
+<text top="409" left="867" width="4" height="6" font="0">5</text>
+<text top="404" left="859" width="4" height="6" font="0">5</text>
+<text top="349" left="863" width="9" height="6" font="2">U5</text>
+<text top="425" left="863" width="54" height="6" font="3">ZX-PZ2.0-1-5PZZ</text>
+<text top="323" left="867" width="4" height="6" font="0">1</text>
+<text top="318" left="859" width="4" height="6" font="0">1</text>
+<text top="334" left="867" width="4" height="6" font="0">2</text>
+<text top="328" left="859" width="4" height="6" font="0">2</text>
+<text top="295" left="863" width="9" height="6" font="2">U4</text>
+<text top="306" left="863" width="54" height="6" font="3">ZX-PZ2.0-1-2PZZ</text>
+<text top="182" left="340" width="17" height="6" font="2">LED2</text>
+<text top="203" left="340" width="68" height="6" font="2">LED0603-RD_GREEN</text>
+<text top="192" left="340" width="50" height="6" font="3">XL-1608PGC-06</text>
+<text top="561" left="502" width="4" height="6" font="0">1</text>
+<text top="561" left="541" width="4" height="6" font="0">2</text>
+<text top="549" left="512" width="15" height="6" font="2">SW2</text>
+<text top="576" left="507" width="30" height="6" font="3">ST-1185S</text>
+<text top="560" left="577" width="14" height="6" font="3">FRC</text>
+<text top="592" left="529" width="12" height="6" font="2">C14</text>
+<text top="614" left="529" width="20" height="6" font="2">C0603</text>
+<text top="603" left="529" width="19" height="6" font="3">100nF</text>
+<text top="442" left="580" width="4" height="6" font="0">1</text>
+<text top="436" left="589" width="4" height="6" font="0">1</text>
+<text top="453" left="580" width="4" height="6" font="0">2</text>
+<text top="447" left="589" width="4" height="6" font="0">2</text>
+<text top="463" left="580" width="4" height="6" font="0">3</text>
+<text top="458" left="589" width="4" height="6" font="0">3</text>
+<text top="474" left="580" width="4" height="6" font="0">4</text>
+<text top="469" left="589" width="4" height="6" font="0">4</text>
+<text top="485" left="580" width="4" height="6" font="0">0</text>
+<text top="480" left="589" width="4" height="6" font="0">0</text>
+<text top="500" left="566" width="13" height="6" font="2">CN2</text>
+<text top="511" left="491" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="133" left="340" width="9" height="6" font="2">R2</text>
+<text top="144" left="340" width="7" height="6" font="3">1k</text>
+<text top="95" left="320" width="17" height="6" font="2">+U5V</text>
+<text top="95" left="432" width="21" height="6" font="2">+U3V3</text>
+<text top="133" left="453" width="9" height="6" font="2">R3</text>
+<text top="144" left="453" width="7" height="6" font="3">1k</text>
+<text top="392" left="599" width="17" height="6" font="3">STE1</text>
+<text top="381" left="599" width="18" height="6" font="3">DTR1</text>
+<text top="414" left="599" width="17" height="6" font="3">STE0</text>
+<text top="403" left="599" width="18" height="6" font="3">DTR0</text>
+<text top="587" left="777" width="17" height="6" font="2">LED4</text>
+<text top="608" left="777" width="68" height="6" font="2">LED0603-RD_GREEN</text>
+<text top="597" left="777" width="50" height="6" font="3">XL-1608PGC-06</text>
+<text top="527" left="777" width="9" height="6" font="2">R7</text>
+<text top="549" left="777" width="20" height="6" font="2">R0603</text>
+<text top="538" left="777" width="7" height="6" font="3">1k</text>
+</page>
+<page number="3" position="absolute" top="0" left="0" height="900" width="1273">
+<text top="469" left="614" width="4" height="6" font="0">1</text>
+<text top="480" left="614" width="4" height="6" font="0">2</text>
+<text top="490" left="614" width="4" height="6" font="0">3</text>
+<text top="501" left="614" width="4" height="6" font="0">4</text>
+<text top="512" left="614" width="4" height="6" font="0">5</text>
+<text top="523" left="614" width="4" height="6" font="0">6</text>
+<text top="534" left="614" width="4" height="6" font="0">7</text>
+<text top="544" left="614" width="4" height="6" font="0">8</text>
+<text top="452" left="610" width="9" height="6" font="2">H4</text>
+<text top="560" left="566" width="56" height="6" font="3">B-2100S08P-A110</text>
+<text top="339" left="614" width="4" height="6" font="0">1</text>
+<text top="350" left="614" width="4" height="6" font="0">2</text>
+<text top="361" left="614" width="4" height="6" font="0">3</text>
+<text top="372" left="614" width="4" height="6" font="0">4</text>
+<text top="382" left="614" width="4" height="6" font="0">5</text>
+<text top="393" left="614" width="4" height="6" font="0">6</text>
+<text top="404" left="614" width="4" height="6" font="0">7</text>
+<text top="415" left="614" width="4" height="6" font="0">8</text>
+<text top="322" left="610" width="9" height="6" font="2">H1</text>
+<text top="430" left="566" width="56" height="6" font="3">B-2100S08P-A110</text>
+<text top="339" left="661" width="4" height="6" font="0">1</text>
+<text top="350" left="661" width="4" height="6" font="0">2</text>
+<text top="361" left="661" width="4" height="6" font="0">3</text>
+<text top="372" left="661" width="4" height="6" font="0">4</text>
+<text top="382" left="661" width="4" height="6" font="0">5</text>
+<text top="393" left="661" width="4" height="6" font="0">6</text>
+<text top="404" left="661" width="4" height="6" font="0">7</text>
+<text top="415" left="661" width="4" height="6" font="0">8</text>
+<text top="322" left="642" width="9" height="6" font="2">H2</text>
+<text top="430" left="642" width="56" height="6" font="3">B-2100S08P-A110</text>
+<text top="469" left="661" width="4" height="6" font="0">1</text>
+<text top="480" left="661" width="4" height="6" font="0">2</text>
+<text top="490" left="661" width="4" height="6" font="0">3</text>
+<text top="501" left="661" width="4" height="6" font="0">4</text>
+<text top="512" left="661" width="4" height="6" font="0">5</text>
+<text top="523" left="661" width="4" height="6" font="0">6</text>
+<text top="534" left="661" width="4" height="6" font="0">7</text>
+<text top="544" left="661" width="4" height="6" font="0">8</text>
+<text top="452" left="642" width="9" height="6" font="2">H5</text>
+<text top="560" left="642" width="56" height="6" font="3">B-2100S08P-A110</text>
+<text top="473" left="572" width="18" height="6" font="3">MS11</text>
+<text top="484" left="572" width="18" height="6" font="3">MS21</text>
+<text top="495" left="572" width="18" height="6" font="3">MS31</text>
+<text top="527" left="572" width="17" height="6" font="3">STE1</text>
+<text top="538" left="572" width="18" height="6" font="3">DTR1</text>
+<text top="516" left="691" width="12" height="6" font="3">11B</text>
+<text top="506" left="691" width="12" height="6" font="3">11A</text>
+<text top="495" left="691" width="12" height="6" font="3">21A</text>
+<text top="484" left="691" width="12" height="6" font="3">21B</text>
+<text top="484" left="815" width="12" height="6" font="3">21B</text>
+<text top="495" left="815" width="12" height="6" font="3">21A</text>
+<text top="506" left="815" width="12" height="6" font="3">11A</text>
+<text top="516" left="815" width="12" height="6" font="3">11B</text>
+<text top="490" left="846" width="4" height="6" font="0">1</text>
+<text top="501" left="846" width="4" height="6" font="0">2</text>
+<text top="512" left="846" width="4" height="6" font="0">3</text>
+<text top="523" left="846" width="4" height="6" font="0">4</text>
+<text top="473" left="842" width="9" height="6" font="2">H6</text>
+<text top="538" left="842" width="56" height="6" font="3">B-2100S04P-A110</text>
+<text top="490" left="776" width="4" height="6" font="0">1</text>
+<text top="485" left="767" width="4" height="6" font="0">1</text>
+<text top="501" left="776" width="4" height="6" font="0">2</text>
+<text top="496" left="767" width="4" height="6" font="0">2</text>
+<text top="512" left="776" width="4" height="6" font="0">3</text>
+<text top="507" left="767" width="4" height="6" font="0">3</text>
+<text top="523" left="776" width="4" height="6" font="0">4</text>
+<text top="517" left="767" width="4" height="6" font="0">4</text>
+<text top="473" left="772" width="13" height="6" font="2">CN5</text>
+<text top="538" left="772" width="52" height="6" font="3">ZX-XH2.54-4PZZ</text>
+<text top="466" left="724" width="20" height="6" font="2">+P12V</text>
+<text top="533" left="723" width="21" height="6" font="2">+U3V3</text>
+<text top="344" left="572" width="18" height="6" font="3">MS10</text>
+<text top="354" left="572" width="18" height="6" font="3">MS20</text>
+<text top="365" left="572" width="18" height="6" font="3">MS30</text>
+<text top="398" left="572" width="17" height="6" font="3">STE0</text>
+<text top="408" left="572" width="18" height="6" font="3">DTR0</text>
+<text top="403" left="723" width="21" height="6" font="2">+U3V3</text>
+<text top="387" left="691" width="12" height="6" font="3">10B</text>
+<text top="376" left="691" width="12" height="6" font="3">10A</text>
+<text top="365" left="691" width="12" height="6" font="3">20A</text>
+<text top="354" left="691" width="12" height="6" font="3">20B</text>
+<text top="336" left="724" width="20" height="6" font="2">+P12V</text>
+<text top="361" left="776" width="4" height="6" font="0">1</text>
+<text top="355" left="767" width="4" height="6" font="0">1</text>
+<text top="372" left="776" width="4" height="6" font="0">2</text>
+<text top="366" left="767" width="4" height="6" font="0">2</text>
+<text top="382" left="776" width="4" height="6" font="0">3</text>
+<text top="377" left="767" width="4" height="6" font="0">3</text>
+<text top="393" left="776" width="4" height="6" font="0">4</text>
+<text top="388" left="767" width="4" height="6" font="0">4</text>
+<text top="344" left="772" width="13" height="6" font="2">CN3</text>
+<text top="408" left="772" width="52" height="6" font="3">ZX-XH2.54-4PZZ</text>
+<text top="361" left="846" width="4" height="6" font="0">1</text>
+<text top="372" left="846" width="4" height="6" font="0">2</text>
+<text top="382" left="846" width="4" height="6" font="0">3</text>
+<text top="393" left="846" width="4" height="6" font="0">4</text>
+<text top="344" left="842" width="9" height="6" font="2">H3</text>
+<text top="408" left="842" width="56" height="6" font="3">B-2100S04P-A110</text>
+<text top="387" left="815" width="12" height="6" font="3">10B</text>
+<text top="376" left="815" width="12" height="6" font="3">10A</text>
+<text top="365" left="815" width="12" height="6" font="3">20A</text>
+<text top="354" left="815" width="12" height="6" font="3">20B</text>
+<text top="414" left="237" width="11" height="6" font="3">PDI</text>
+<text top="435" left="269" width="12" height="6" font="2">R13</text>
+<text top="457" left="269" width="20" height="6" font="2">R0603</text>
+<text top="446" left="269" width="11" height="6" font="3">20k</text>
+<text top="408" left="318" width="9" height="6" font="2">Q4</text>
+<text top="425" left="318" width="24" height="6" font="3">2N7002</text>
+<text top="317" left="286" width="20" height="6" font="2">+P12V</text>
+<text top="354" left="313" width="12" height="6" font="2">R10</text>
+<text top="376" left="313" width="20" height="6" font="2">R0603</text>
+<text top="365" left="313" width="11" height="6" font="3">10k</text>
+<text top="415" left="408" width="4" height="6" font="0">1</text>
+<text top="409" left="400" width="4" height="6" font="0">1</text>
+<text top="426" left="408" width="4" height="6" font="0">2</text>
+<text top="420" left="400" width="4" height="6" font="0">2</text>
+<text top="398" left="404" width="13" height="6" font="2">CN4</text>
+<text top="446" left="404" width="67" height="6" font="3">WJ15EDGVC-3.81-2P</text>
+<text top="419" left="367" width="9" height="6" font="2">D3</text>
+<text top="430" left="367" width="17" height="6" font="3">SS14</text>
+</page>
+<page number="4" position="absolute" top="0" left="0" height="900" width="1273">
+<text top="134" left="305" width="4" height="6" font="0">1</text>
+<text top="129" left="313" width="4" height="6" font="0">1</text>
+<text top="145" left="305" width="4" height="6" font="0">2</text>
+<text top="139" left="313" width="4" height="6" font="0">2</text>
+<text top="156" left="305" width="4" height="6" font="0">3</text>
+<text top="150" left="313" width="4" height="6" font="0">3</text>
+<text top="166" left="305" width="4" height="6" font="0">4</text>
+<text top="161" left="313" width="4" height="6" font="0">4</text>
+<text top="177" left="305" width="4" height="6" font="0">0</text>
+<text top="172" left="313" width="4" height="6" font="0">0</text>
+<text top="117" left="280" width="13" height="6" font="2">CN6</text>
+<text top="192" left="280" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="133" left="383" width="21" height="6" font="2">+U3V3</text>
+<text top="138" left="323" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="149" left="323" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="280" left="305" width="4" height="6" font="0">1</text>
+<text top="274" left="313" width="4" height="6" font="0">1</text>
+<text top="291" left="305" width="4" height="6" font="0">2</text>
+<text top="285" left="313" width="4" height="6" font="0">2</text>
+<text top="301" left="305" width="4" height="6" font="0">3</text>
+<text top="296" left="313" width="4" height="6" font="0">3</text>
+<text top="312" left="305" width="4" height="6" font="0">4</text>
+<text top="307" left="313" width="4" height="6" font="0">4</text>
+<text top="323" left="305" width="4" height="6" font="0">0</text>
+<text top="318" left="313" width="4" height="6" font="0">0</text>
+<text top="263" left="280" width="13" height="6" font="2">CN9</text>
+<text top="338" left="280" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="279" left="383" width="21" height="6" font="2">+U3V3</text>
+<text top="284" left="323" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="295" left="323" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="420" left="305" width="4" height="6" font="0">1</text>
+<text top="415" left="313" width="4" height="6" font="0">1</text>
+<text top="431" left="305" width="4" height="6" font="0">2</text>
+<text top="426" left="313" width="4" height="6" font="0">2</text>
+<text top="442" left="305" width="4" height="6" font="0">3</text>
+<text top="436" left="313" width="4" height="6" font="0">3</text>
+<text top="453" left="305" width="4" height="6" font="0">4</text>
+<text top="447" left="313" width="4" height="6" font="0">4</text>
+<text top="463" left="305" width="4" height="6" font="0">0</text>
+<text top="458" left="313" width="4" height="6" font="0">0</text>
+<text top="403" left="280" width="17" height="6" font="2">CN12</text>
+<text top="479" left="280" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="419" left="383" width="21" height="6" font="2">+U3V3</text>
+<text top="425" left="323" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="435" left="323" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="555" left="305" width="4" height="6" font="0">1</text>
+<text top="550" left="313" width="4" height="6" font="0">1</text>
+<text top="566" left="305" width="4" height="6" font="0">2</text>
+<text top="561" left="313" width="4" height="6" font="0">2</text>
+<text top="577" left="305" width="4" height="6" font="0">3</text>
+<text top="571" left="313" width="4" height="6" font="0">3</text>
+<text top="588" left="305" width="4" height="6" font="0">4</text>
+<text top="582" left="313" width="4" height="6" font="0">4</text>
+<text top="598" left="305" width="4" height="6" font="0">0</text>
+<text top="593" left="313" width="4" height="6" font="0">0</text>
+<text top="538" left="280" width="17" height="6" font="2">CN14</text>
+<text top="614" left="280" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="554" left="383" width="21" height="6" font="2">+U3V3</text>
+<text top="560" left="323" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="570" left="323" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="134" left="591" width="4" height="6" font="0">1</text>
+<text top="129" left="599" width="4" height="6" font="0">1</text>
+<text top="145" left="591" width="4" height="6" font="0">2</text>
+<text top="139" left="599" width="4" height="6" font="0">2</text>
+<text top="156" left="591" width="4" height="6" font="0">3</text>
+<text top="150" left="599" width="4" height="6" font="0">3</text>
+<text top="166" left="591" width="4" height="6" font="0">4</text>
+<text top="161" left="599" width="4" height="6" font="0">4</text>
+<text top="177" left="591" width="4" height="6" font="0">0</text>
+<text top="172" left="599" width="4" height="6" font="0">0</text>
+<text top="117" left="566" width="13" height="6" font="2">CN7</text>
+<text top="192" left="566" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="133" left="669" width="21" height="6" font="2">+U3V3</text>
+<text top="138" left="610" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="149" left="610" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="280" left="591" width="4" height="6" font="0">1</text>
+<text top="274" left="599" width="4" height="6" font="0">1</text>
+<text top="291" left="591" width="4" height="6" font="0">2</text>
+<text top="285" left="599" width="4" height="6" font="0">2</text>
+<text top="301" left="591" width="4" height="6" font="0">3</text>
+<text top="296" left="599" width="4" height="6" font="0">3</text>
+<text top="312" left="591" width="4" height="6" font="0">4</text>
+<text top="307" left="599" width="4" height="6" font="0">4</text>
+<text top="323" left="591" width="4" height="6" font="0">0</text>
+<text top="318" left="599" width="4" height="6" font="0">0</text>
+<text top="263" left="566" width="17" height="6" font="2">CN10</text>
+<text top="338" left="566" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="279" left="669" width="21" height="6" font="2">+U3V3</text>
+<text top="284" left="610" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="295" left="610" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="134" left="867" width="4" height="6" font="0">1</text>
+<text top="129" left="875" width="4" height="6" font="0">1</text>
+<text top="145" left="867" width="4" height="6" font="0">2</text>
+<text top="139" left="875" width="4" height="6" font="0">2</text>
+<text top="156" left="867" width="4" height="6" font="0">3</text>
+<text top="150" left="875" width="4" height="6" font="0">3</text>
+<text top="166" left="867" width="4" height="6" font="0">4</text>
+<text top="161" left="875" width="4" height="6" font="0">4</text>
+<text top="177" left="867" width="4" height="6" font="0">0</text>
+<text top="172" left="875" width="4" height="6" font="0">0</text>
+<text top="117" left="842" width="13" height="6" font="2">CN8</text>
+<text top="192" left="842" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="133" left="945" width="21" height="6" font="2">+U3V3</text>
+<text top="138" left="885" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="149" left="885" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="280" left="867" width="4" height="6" font="0">1</text>
+<text top="274" left="875" width="4" height="6" font="0">1</text>
+<text top="291" left="867" width="4" height="6" font="0">2</text>
+<text top="285" left="875" width="4" height="6" font="0">2</text>
+<text top="301" left="867" width="4" height="6" font="0">3</text>
+<text top="296" left="875" width="4" height="6" font="0">3</text>
+<text top="312" left="867" width="4" height="6" font="0">4</text>
+<text top="307" left="875" width="4" height="6" font="0">4</text>
+<text top="323" left="867" width="4" height="6" font="0">0</text>
+<text top="318" left="875" width="4" height="6" font="0">0</text>
+<text top="263" left="842" width="17" height="6" font="2">CN11</text>
+<text top="338" left="842" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="279" left="945" width="21" height="6" font="2">+U3V3</text>
+<text top="284" left="885" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="295" left="885" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="420" left="867" width="4" height="6" font="0">1</text>
+<text top="415" left="875" width="4" height="6" font="0">1</text>
+<text top="431" left="867" width="4" height="6" font="0">2</text>
+<text top="426" left="875" width="4" height="6" font="0">2</text>
+<text top="442" left="867" width="4" height="6" font="0">3</text>
+<text top="436" left="875" width="4" height="6" font="0">3</text>
+<text top="453" left="867" width="4" height="6" font="0">4</text>
+<text top="447" left="875" width="4" height="6" font="0">4</text>
+<text top="463" left="867" width="4" height="6" font="0">0</text>
+<text top="458" left="875" width="4" height="6" font="0">0</text>
+<text top="403" left="842" width="17" height="6" font="2">CN13</text>
+<text top="479" left="842" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="419" left="945" width="21" height="6" font="2">+U3V3</text>
+<text top="425" left="885" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="435" left="885" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="555" left="867" width="4" height="6" font="0">1</text>
+<text top="550" left="875" width="4" height="6" font="0">1</text>
+<text top="566" left="867" width="4" height="6" font="0">2</text>
+<text top="561" left="875" width="4" height="6" font="0">2</text>
+<text top="577" left="867" width="4" height="6" font="0">3</text>
+<text top="571" left="875" width="4" height="6" font="0">3</text>
+<text top="588" left="867" width="4" height="6" font="0">4</text>
+<text top="582" left="875" width="4" height="6" font="0">4</text>
+<text top="598" left="867" width="4" height="6" font="0">0</text>
+<text top="593" left="875" width="4" height="6" font="0">0</text>
+<text top="538" left="842" width="17" height="6" font="2">CN16</text>
+<text top="614" left="842" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="554" left="945" width="21" height="6" font="2">+U3V3</text>
+<text top="560" left="885" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="570" left="885" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="555" left="591" width="4" height="6" font="0">1</text>
+<text top="550" left="599" width="4" height="6" font="0">1</text>
+<text top="566" left="591" width="4" height="6" font="0">2</text>
+<text top="561" left="599" width="4" height="6" font="0">2</text>
+<text top="577" left="591" width="4" height="6" font="0">3</text>
+<text top="571" left="599" width="4" height="6" font="0">3</text>
+<text top="588" left="591" width="4" height="6" font="0">4</text>
+<text top="582" left="599" width="4" height="6" font="0">4</text>
+<text top="598" left="591" width="4" height="6" font="0">0</text>
+<text top="593" left="599" width="4" height="6" font="0">0</text>
+<text top="538" left="566" width="17" height="6" font="2">CN15</text>
+<text top="614" left="566" width="80" height="6" font="3">BM04B-SRSS-TB(LF)(SN)</text>
+<text top="554" left="669" width="21" height="6" font="2">+U3V3</text>
+<text top="560" left="610" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="570" left="610" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="462" left="502" width="29" height="6" font="3">IIC1-SDA</text>
+<text top="473" left="502" width="28" height="6" font="3">IIC1-SCL</text>
+<text top="430" left="556" width="12" height="6" font="2">R14</text>
+<text top="452" left="556" width="20" height="6" font="2">R0603</text>
+<text top="441" left="556" width="11" height="6" font="3">10k</text>
+<text top="430" left="599" width="12" height="6" font="2">R15</text>
+<text top="452" left="599" width="20" height="6" font="2">R0603</text>
+<text top="441" left="599" width="11" height="6" font="3">10k</text>
+<text top="395" left="534" width="21" height="6" font="2">+U3V3</text>
+<text top="395" left="578" width="21" height="6" font="2">+U3V3</text>
+<text top="462" left="685" width="29" height="6" font="3">IIC2-SDA</text>
+<text top="473" left="685" width="28" height="6" font="3">IIC2-SCL</text>
+<text top="430" left="685" width="12" height="6" font="2">R17</text>
+<text top="452" left="685" width="20" height="6" font="2">R0603</text>
+<text top="441" left="685" width="11" height="6" font="3">10k</text>
+<text top="430" left="642" width="12" height="6" font="2">R16</text>
+<text top="452" left="642" width="20" height="6" font="2">R0603</text>
+<text top="441" left="642" width="11" height="6" font="3">10k</text>
+<text top="395" left="664" width="21" height="6" font="2">+U3V3</text>
+<text top="395" left="621" width="21" height="6" font="2">+U3V3</text>
+</page>
+<outline>
+<item>Pages</item>
+<outline>
+<item page="1">SCH_PAS-SET_SCH 1-01-PWR</item>
+<item page="2">SCH_PAS-SET_SCH 2-02-MCU</item>
+<item page="3">SCH_PAS-SET_SCH 3-03-PDE</item>
+<item page="4">SCH_PAS-SET_SCH 4-04-IDR</item>
+</outline>
+<item>Net</item>
+<outline>
+<item>GND</item>
+<outline>
+<item page="1">$1N451</item>
+<item page="1">$1N479</item>
+<item page="1">$1N493</item>
+<item page="1">$1N796</item>
+<item page="1">$1N998</item>
+<item page="1">$1N1164</item>
+<item page="1">$1N1187</item>
+<item page="1">$1N1515</item>
+<item page="1">$1N1565</item>
+<item page="1">$1N1752</item>
+<item page="1">$1N3172</item>
+<item page="1">$1N3180</item>
+<item page="1">$1N3181</item>
+<item page="1">$1N3757</item>
+<item page="1">$1N5722</item>
+<item page="2">$2N2054</item>
+<item page="2">$2N2128</item>
+<item page="2">$2N2188</item>
+<item page="2">$2N2205</item>
+<item page="2">$2N2337</item>
+<item page="2">$2N2390</item>
+<item page="2">$2N2606</item>
+<item page="2">$2N2608</item>
+<item page="2">$2N2824</item>
+<item page="2">$2N2927</item>
+<item page="2">$2N2932</item>
+<item page="2">$2N3081</item>
+<item page="2">$2N3256</item>
+<item page="2">$2N3287</item>
+<item page="2">$2N3371</item>
+<item page="2">$2N3396</item>
+<item page="2">$2N4357</item>
+<item page="2">$2N7976</item>
+<item page="2">$2N8089</item>
+<item page="2">$2N8090</item>
+<item page="2">$2N9516</item>
+<item page="2">$2N9579</item>
+<item page="3">$3N9550</item>
+<item page="3">$3N9723</item>
+<item page="3">$3N9725</item>
+<item page="3">$3N9750</item>
+<item page="3">$3N9915</item>
+<item page="3">$3N9921</item>
+<item page="3">$3N10687</item>
+<item page="3">$3N10890</item>
+<item page="4">$4N133</item>
+<item page="4">$4N147</item>
+<item page="4">$4N285</item>
+<item page="4">$4N290</item>
+<item page="4">$4N484</item>
+<item page="4">$4N489</item>
+<item page="4">$4N504</item>
+<item page="4">$4N506</item>
+<item page="4">$4N1114</item>
+<item page="4">$4N1116</item>
+<item page="4">$4N1131</item>
+<item page="4">$4N1133</item>
+<item page="4">$4N1512</item>
+<item page="4">$4N1514</item>
+<item page="4">$4N1524</item>
+<item page="4">$4N1534</item>
+<item page="4">$4N1536</item>
+<item page="4">$4N1538</item>
+<item page="4">$4N1543</item>
+<item page="4">$4N1545</item>
+<item page="4">$4N1664</item>
+<item page="4">$4N1671</item>
+</outline>
+<item>PDI</item>
+<outline>
+<item page="2">$2N7240</item>
+<item page="3">$3N10272</item>
+</outline>
+<item>RSTS</item>
+<outline>
+<item page="2">$2N2022</item>
+<item page="2">$2N2601</item>
+<item page="2">$2N3906</item>
+</outline>
+<item>BOOT</item>
+<outline>
+<item page="2">$2N2388</item>
+<item page="2">$2N2415</item>
+<item page="2">$2N4101</item>
+</outline>
+<item>VUSB</item>
+<outline>
+<item page="2">$2N2926</item>
+<item page="2">$2N3261</item>
+<item page="2">$2N3507</item>
+</outline>
+<item>UD+</item>
+<outline>
+<item page="2">$2N2928</item>
+<item page="2">$2N3384</item>
+</outline>
+<item>UD-</item>
+<outline>
+<item page="2">$2N2930</item>
+<item page="2">$2N3388</item>
+</outline>
+<item>RTS</item>
+<outline>
+<item page="2">$2N3513</item>
+<item page="2">$2N4054</item>
+</outline>
+<item>DTR</item>
+<outline>
+<item page="2">$2N3526</item>
+<item page="2">$2N3954</item>
+</outline>
+<item>FRC</item>
+<outline>
+<item page="2">$2N7431</item>
+<item page="2">$2N8087</item>
+</outline>
+<item>10B</item>
+<outline>
+<item page="3">$3N9908</item>
+<item page="3">$3N9918</item>
+</outline>
+<item>10A</item>
+<outline>
+<item page="3">$3N9912</item>
+<item page="3">$3N9916</item>
+</outline>
+<item>11A</item>
+<outline>
+<item page="3">$3N9706</item>
+<item page="3">$3N9716</item>
+</outline>
+<item>11B</item>
+<outline>
+<item page="3">$3N9708</item>
+<item page="3">$3N9720</item>
+</outline>
+<item>20B</item>
+<outline>
+<item page="3">$3N9906</item>
+<item page="3">$3N9922</item>
+</outline>
+<item>20A</item>
+<outline>
+<item page="3">$3N9910</item>
+<item page="3">$3N9924</item>
+</outline>
+<item>21B</item>
+<outline>
+<item page="3">$3N9710</item>
+<item page="3">$3N9718</item>
+</outline>
+<item>21A</item>
+<outline>
+<item page="3">$3N9712</item>
+<item page="3">$3N9714</item>
+</outline>
+<item>+M5V</item>
+<outline>
+<item page="1">$1N1372</item>
+<item page="1">$1N3177</item>
+<item page="1">$1N5708</item>
+</outline>
+<item>+P12V</item>
+<outline>
+<item page="1">$1N1782</item>
+<item page="3">$3N9724</item>
+<item page="3">$3N9914</item>
+<item page="3">$3N10945</item>
+</outline>
+<item>+U3V3</item>
+<outline>
+<item page="1">$1N3173</item>
+<item page="2">$2N1950</item>
+<item page="2">$2N3083</item>
+<item page="2">$2N3786</item>
+<item page="2">$2N3800</item>
+<item page="2">$2N15048</item>
+<item page="3">$3N9722</item>
+<item page="3">$3N9920</item>
+<item page="4">$4N161</item>
+<item page="4">$4N295</item>
+<item page="4">$4N491</item>
+<item page="4">$4N496</item>
+<item page="4">$4N1121</item>
+<item page="4">$4N1126</item>
+<item page="4">$4N1516</item>
+<item page="4">$4N1532</item>
+<item page="4">$4N1547</item>
+<item page="4">$4N1555</item>
+<item page="4">$4N1669</item>
+<item page="4">$4N1890</item>
+<item page="4">$4N1894</item>
+<item page="4">$4N2017</item>
+<item page="4">$4N2027</item>
+</outline>
+<item>+U5V</item>
+<outline>
+<item page="2">$2N7235</item>
+<item page="2">$2N14997</item>
+</outline>
+<item>$1N426</item>
+<outline>
+<item page="1">$1N426</item>
+</outline>
+<item>$1N801</item>
+<outline>
+<item page="1">$1N801</item>
+</outline>
+<item>$1N3740</item>
+<outline>
+<item page="1">$1N3740</item>
+</outline>
+<item>$2N3376</item>
+<outline>
+<item page="2">$2N3376</item>
+</outline>
+<item>$2N3768</item>
+<outline>
+<item page="2">$2N3768</item>
+</outline>
+<item>$2N3772</item>
+<outline>
+<item page="2">$2N3772</item>
+</outline>
+<item>$2N3913</item>
+<outline>
+<item page="2">$2N3913</item>
+</outline>
+<item>$2N4052</item>
+<outline>
+<item page="2">$2N4052</item>
+</outline>
+<item>$2N4340</item>
+<outline>
+<item page="2">$2N4340</item>
+</outline>
+<item>$2N7386</item>
+<outline>
+<item page="2">$2N7386</item>
+</outline>
+<item>$2N7396</item>
+<outline>
+<item page="2">$2N7396</item>
+</outline>
+<item>$2N7585</item>
+<outline>
+<item page="2">$2N7585</item>
+</outline>
+<item>$2N7590</item>
+<outline>
+<item page="2">$2N7590</item>
+</outline>
+<item>$2N7595</item>
+<outline>
+<item page="2">$2N7595</item>
+</outline>
+<item>$2N7600</item>
+<outline>
+<item page="2">$2N7600</item>
+</outline>
+<item>$2N7605</item>
+<outline>
+<item page="2">$2N7605</item>
+</outline>
+<item>$2N7815</item>
+<outline>
+<item page="2">$2N7815</item>
+</outline>
+<item>$2N7819</item>
+<outline>
+<item page="2">$2N7819</item>
+</outline>
+<item>$2N7883</item>
+<outline>
+<item page="2">$2N7883</item>
+</outline>
+<item>$2N7887</item>
+<outline>
+<item page="2">$2N7887</item>
+</outline>
+<item>$2N7977</item>
+<outline>
+<item page="2">$2N7977</item>
+</outline>
+<item>$2N15146</item>
+<outline>
+<item page="2">$2N15146</item>
+</outline>
+<item>$2N15150</item>
+<outline>
+<item page="2">$2N15150</item>
+</outline>
+<item>$3N9545</item>
+<outline>
+<item page="3">$3N9545</item>
+</outline>
+<item>$3N9749</item>
+<outline>
+<item page="3">$3N9749</item>
+</outline>
+<item>$3N10623</item>
+<outline>
+<item page="3">$3N10623</item>
+</outline>
+<item>DTR0</item>
+<outline>
+<item page="2">$2N15061</item>
+<item page="3">$3N9743</item>
+</outline>
+<item>DTR1</item>
+<outline>
+<item page="2">$2N15057</item>
+<item page="3">$3N9541</item>
+</outline>
+<item>IIC1-SCL</item>
+<outline>
+<item page="2">$2N2489</item>
+<item page="4">$4N170</item>
+<item page="4">$4N287</item>
+<item page="4">$4N486</item>
+<item page="4">$4N501</item>
+<item page="4">$4N1118</item>
+<item page="4">$4N1135</item>
+<item page="4">$4N1700</item>
+</outline>
+<item>IIC1-SDA</item>
+<outline>
+<item page="2">$2N7205</item>
+<item page="4">$4N166</item>
+<item page="4">$4N292</item>
+<item page="4">$4N493</item>
+<item page="4">$4N498</item>
+<item page="4">$4N1123</item>
+<item page="4">$4N1128</item>
+<item page="4">$4N1697</item>
+</outline>
+<item>IIC2-SCL</item>
+<outline>
+<item page="2">$2N2480</item>
+<item page="4">$4N1521</item>
+<item page="4">$4N1529</item>
+<item page="4">$4N1540</item>
+<item page="4">$4N1552</item>
+<item page="4">$4N1666</item>
+<item page="4">$4N2023</item>
+</outline>
+<item>IIC2-SDA</item>
+<outline>
+<item page="2">$2N2486</item>
+<item page="4">$4N1518</item>
+<item page="4">$4N1526</item>
+<item page="4">$4N1549</item>
+<item page="4">$4N1557</item>
+<item page="4">$4N1673</item>
+<item page="4">$4N2019</item>
+</outline>
+<item>MS10</item>
+<outline>
+<item page="2">$2N7400</item>
+<item page="3">$3N9751</item>
+</outline>
+<item>MS11</item>
+<outline>
+<item page="2">$2N7414</item>
+<item page="3">$3N9551</item>
+</outline>
+<item>MS20</item>
+<outline>
+<item page="2">$2N7404</item>
+<item page="3">$3N9745</item>
+</outline>
+<item>MS21</item>
+<outline>
+<item page="2">$2N7419</item>
+<item page="3">$3N9546</item>
+</outline>
+<item>MS30</item>
+<outline>
+<item page="2">$2N7409</item>
+<item page="3">$3N9747</item>
+</outline>
+<item>MS31</item>
+<outline>
+<item page="2">$2N7427</item>
+<item page="3">$3N9548</item>
+</outline>
+<item>STE0</item>
+<outline>
+<item page="2">$2N15059</item>
+<item page="3">$3N9741</item>
+</outline>
+<item>STE1</item>
+<outline>
+<item page="2">$2N15055</item>
+<item page="3">$3N9543</item>
+</outline>
+<item>U0TXD</item>
+<outline>
+<item page="2">$2N2426</item>
+<item page="2">$2N3296</item>
+<item page="2">$2N3805</item>
+</outline>
+<item>U0RXD</item>
+<outline>
+<item page="2">$2N2429</item>
+<item page="2">$2N3292</item>
+<item page="2">$2N3809</item>
+</outline>
+</outline>
+</outline>
+</pdf2xml>

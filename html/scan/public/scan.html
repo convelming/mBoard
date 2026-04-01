@@ -44,6 +44,10 @@
         </div>
         <div class="row" style="margin-bottom:10px">
           <label>密码 <input id="wifiPwd" type="password" placeholder="请输入 Wi-Fi 密码" /></label>
+          <label class="muted" style="min-width:auto">
+            <input id="wifiPwdPlain" type="checkbox" />
+            显示密码
+          </label>
         </div>
         <div class="row">
           <button id="provisionBtn">2) 发送配网信息</button>
@@ -73,6 +77,10 @@
         </div>
         <div class="row" style="margin-bottom:10px">
           <label>密码 <input id="iosWifiPwd" type="password" placeholder="请输入 Wi-Fi 密码" /></label>
+          <label class="muted" style="min-width:auto">
+            <input id="iosWifiPwdPlain" type="checkbox" />
+            显示密码
+          </label>
         </div>
         <div class="row">
           <button id="iosProvisionBtn">提交 SoftAP 配网</button>
@@ -99,6 +107,7 @@
     const wifiSsid = document.getElementById('wifiSsid');
     const wifiListSel = document.getElementById('wifiListSel');
     const wifiPwd = document.getElementById('wifiPwd');
+    const wifiPwdPlain = document.getElementById('wifiPwdPlain');
     const wifiListBox = document.getElementById('wifiListBox');
     const bleState = document.getElementById('bleState');
 
@@ -111,6 +120,7 @@
     const iosWifiListBox = document.getElementById('iosWifiListBox');
     const iosWifiSsidEl = document.getElementById('iosWifiSsid');
     const iosWifiPwdEl = document.getElementById('iosWifiPwd');
+    const iosWifiPwdPlain = document.getElementById('iosWifiPwdPlain');
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -137,6 +147,7 @@
       if (!r.ok && data && data.ok === undefined) data.ok = false;
       return data;
     }
+
 
     function setProvisionModeUI() {
       if (isIOS) {
@@ -175,6 +186,11 @@
 
     function parseStatusPayload(text) {
       try { return JSON.parse(text); } catch { return { raw: text }; }
+    }
+
+    function togglePwdInput(inputEl, visible) {
+      if (!inputEl) return;
+      inputEl.type = visible ? 'text' : 'password';
     }
 
     function normalizeWifiList(payload) {
@@ -489,6 +505,12 @@
     iosWifiListSel.onchange = () => {
       if (iosWifiListSel.value) iosWifiSsidEl.value = iosWifiListSel.value;
     };
+    wifiPwdPlain.onchange = () => {
+      togglePwdInput(wifiPwd, !!wifiPwdPlain.checked);
+    };
+    iosWifiPwdPlain.onchange = () => {
+      togglePwdInput(iosWifiPwdEl, !!iosWifiPwdPlain.checked);
+    };
 
     document.getElementById('forceOnBtn').onclick = async () => {
       const id = idEl.value.trim();
@@ -500,6 +522,8 @@
       checkStatus(false);
     };
 
+    togglePwdInput(wifiPwd, !!wifiPwdPlain.checked);
+    togglePwdInput(iosWifiPwdEl, !!iosWifiPwdPlain.checked);
     setProvisionModeUI();
     checkStatus(true);
   </script>

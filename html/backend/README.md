@@ -13,6 +13,28 @@ Then open:
 - `http://127.0.0.1:8866/gamespace.html?productId=MBP1SCNEA26030001`
 - `http://127.0.0.1:8866/pid-login.html`
 
+## HTTPS start (for Web Serial / Web Bluetooth secure context)
+
+Generate local cert/key (example with OpenSSL):
+
+```bash
+openssl req -x509 -nodes -newkey rsa:2048 -days 825 \
+  -keyout mboard-key.pem -out mboard-cert.pem
+```
+
+Start HTTPS:
+
+```bash
+cd /Users/convel/Documents/mTabula/html
+python3 ./backend/server.py --host 0.0.0.0 --port 8866 \
+  --https --cert-file /path/to/mboard-cert.pem --key-file /path/to/mboard-key.pem
+```
+
+Then open with LAN IP:
+
+- `https://<your-lan-ip>:8866/pid.html`
+- `https://<your-lan-ip>:8866/scan?id=<productId>`
+
 ## Product ID whitelist
 
 - CSV path: `data/products.csv`

@@ -15,6 +15,7 @@ import json
 import os
 import re
 import secrets
+import ssl
 from datetime import datetime, timezone
 from http.cookies import SimpleCookie
 from http import HTTPStatus
@@ -84,6 +85,10 @@ HALL_FRAME_FIELDS = [
     "max_value",
     "values_json",
 ]
+
+HALL_INTERVAL_MIN_MS = 100
+HALL_INTERVAL_MAX_MS = 60000
+HALL_INTERVAL_DEFAULT_MS = 5000
 
 PRODUCT_DEFAULT_FIELDS = [
     "product_id",
@@ -626,6 +631,57 @@ def read_hall_latest(workspace: Path) -> Dict[str, Any]:
         return {}
 
 
+def normalize_hall_interval_ms(value: Any) -> int:
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return HALL_INTERVAL_DEFAULT_MS
+    if n < HALL_INTERVAL_MIN_MS:
+        return HALL_INTERVAL_MIN_MS
+    if n > HALL_INTERVAL_MAX_MS:
+        return HALL_INTERVAL_MAX_MS
+    return n
+
+
+def read_hall_config(workspace: Path) -> Dict[str, Any]:
+    path = workspace / "hall_config.json"
+    if not path.exists():
+        ms = HALL_INTERVAL_DEFAULT_MS
+        return {
+            "ok": True,
+            "hallIntervalMs": ms,
+            "hallIntervalMsText": str(ms),
+        }
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        ms = normalize_hall_interval_ms(raw.get("hallIntervalMs"))
+        return {
+            "ok": True,
+            "hallIntervalMs": ms,
+            "hallIntervalMsText": str(ms),
+        }
+    except Exception:
+        ms = HALL_INTERVAL_DEFAULT_MS
+        return {
+            "ok": True,
+            "hallIntervalMs": ms,
+            "hallIntervalMsText": str(ms),
+        }
+
+
+def write_hall_config(workspace: Path, hall_interval_ms: int) -> Dict[str, Any]:
+    ms = normalize_hall_interval_ms(hall_interval_ms)
+    path = workspace / "hall_config.json"
+    payload = {
+        "ok": True,
+        "hallIntervalMs": ms,
+        "hallIntervalMsText": str(ms),
+        "updatedAt": now_iso(),
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return payload
+
+
 def board_online_status(workspace: Path, timeout_seconds: int = 90) -> Dict[str, Any]:
     meta_path = workspace / "meta.json"
     if not meta_path.exists():
@@ -805,8 +861,12 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def request_proto(self) -> str:
-        raw = (self.headers.get("X-Forwarded-Proto") or "http").split(",")[0].strip()
-        return raw or "http"
+        forwarded = (self.headers.get("X-Forwarded-Proto") or "").split(",")[0].strip()
+        if forwarded:
+            return forwarded
+        if isinstance(self.connection, ssl.SSLSocket):
+            return "https"
+        return "http"
 
     def request_host(self) -> str:
         host = (self.headers.get("Host") or "").strip()
@@ -1070,6 +1130,25 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
                     self.write_json(HTTPStatus.OK, latest)
                     return
 
+                if method == "GET" and action == "hall-config":
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    cfg = read_hall_config(workspace)
+                    cfg["ok"] = True
+                    cfg["productId"] = product_id
+                    self.write_json(HTTPStatus.OK, cfg)
+                    return
+
+                if method == "POST" and action == "hall-config":
+                    workspace = self.require_product(product_id, create_workspace=True)
+                    body = self.read_json_body()
+                    ms = normalize_hall_interval_ms(body.get("hallIntervalMs"))
+                    payload = write_hall_config(workspace, ms)
+                    update_meta_updated_at(workspace)
+                    payload["ok"] = True
+                    payload["productId"] = product_id
+                    self.write_json(HTTPStatus.OK, payload)
+                    return
+
                 if method == "POST" and action == "moves":
                     workspace = self.require_product(product_id, create_workspace=True)
                     body = self.read_json_body()
@@ -1222,12 +1301,21 @@ class MTabulaHandler(SimpleHTTPRequestHandler):
             )
 
 
-def run_server(host: str, port: int, public_base_url: str = "") -> None:
+def run_server(
+    host: str,
+    port: int,
+    public_base_url: str = "",
+    ssl_context: Optional[ssl.SSLContext] = None,
+) -> None:
     global PUBLIC_BASE_URL
     PUBLIC_BASE_URL = (public_base_url or "").strip()
     ensure_data_layout()
     server = ThreadingHTTPServer((host, port), MTabulaHandler)
-    print(f"mTabula Python backend running: http://{host}:{port}")
+    scheme = "http"
+    if ssl_context is not None:
+        server.socket = ssl_context.wrap_socket(server.socket, server_side=True)
+        scheme = "https"
+    print(f"mTabula Python backend running: {scheme}://{host}:{port}")
     if PUBLIC_BASE_URL:
         print(f"Public base URL: {PUBLIC_BASE_URL}")
     print(f"Project root: {PROJECT_ROOT}")
@@ -1241,13 +1329,39 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--host", default="0.0.0.0", help="bind host")
     parser.add_argument("--port", type=int, default=8866, help="bind port")
     parser.add_argument(
+        "--https",
+        action="store_true",
+        help="enable HTTPS (requires --cert-file and --key-file)",
+    )
+    parser.add_argument(
+        "--cert-file",
+        default=os.getenv("MTABULA_TLS_CERT", ""),
+        help="TLS certificate path (PEM)",
+    )
+    parser.add_argument(
+        "--key-file",
+        default=os.getenv("MTABULA_TLS_KEY", ""),
+        help="TLS private key path (PEM)",
+    )
+    parser.add_argument(
         "--public-base-url",
         default=os.getenv("MTABULA_PUBLIC_BASE_URL", ""),
-        help="optional public base url used in accessUrl/qrUrl, e.g. http://192.168.1.10:8866",
+        help="optional public base url used in accessUrl/qrUrl, e.g. https://192.168.1.10:8866",
     )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    run_server(args.host, args.port, args.public_base_url)
+    ssl_ctx: Optional[ssl.SSLContext] = None
+    if args.https:
+        cert_file = Path(args.cert_file or "").expanduser()
+        key_file = Path(args.key_file or "").expanduser()
+        if not cert_file.is_file():
+            raise SystemExit(f"missing --cert-file: {cert_file}")
+        if not key_file.is_file():
+            raise SystemExit(f"missing --key-file: {key_file}")
+        ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_ctx.load_cert_chain(certfile=str(cert_file), keyfile=str(key_file))
+
+    run_server(args.host, args.port, args.public_base_url, ssl_ctx)

@@ -22,44 +22,32 @@
   <main class="shell">
     <section class="card controls">
       <h1>霍尔传感器阵列测试</h1>
-      <p class="muted">配置参数后即可轮询显示阵列强度/二值。</p>
+      <p class="muted">后端地址固定使用当前页面的 <code>window.location.origin</code>。</p>
 
       <div class="grid">
-        <label>ESP32 IP / Host
-          <input id="host" value="192.168.1.100" placeholder="192.168.1.100:8080" />
-        </label>
-        <label>ESP32 ID
-          <input id="espId" value="MTD211E5FE9C655D" />
-        </label>
         <label>Product ID
-          <input id="productId" value="MBP1SCNEA26030001" />
+          <input id="productId" value="MBP1SCNEA2603000001" />
         </label>
-
-        <label>行数 (Rows)
-          <input id="rows" type="number" min="1" max="64" value="10" />
+        <label>检测行数 (Rows)
+          <input id="rows" type="number" min="1" max="128" value="10" readonly />
         </label>
-        <label>列数 (Cols)
-          <input id="cols" type="number" min="1" max="64" value="11" />
+        <label>检测列数 (Cols)
+          <input id="cols" type="number" min="1" max="128" value="11" readonly />
         </label>
         <label>请求路径
           <input id="apiPath" value="/api/boards/{productId}/hall-latest" />
         </label>
-
-        <label>显示模式
-          <select id="displayMode">
-            <option value="auto">自动识别</option>
-            <option value="intensity">强度热力</option>
-            <option value="binary">二值激活</option>
-          </select>
-        </label>
-        <label>默认颜色
+        <label>关闭颜色
           <input id="offColor" type="color" value="#1f2a40" />
         </label>
         <label>激活颜色
           <input id="onColor" type="color" value="#2ad4a7" />
         </label>
-        <label>轮询间隔(ms)
+        <label>前端轮询间隔 (ms)
           <input id="intervalMs" type="number" min="100" max="10000" value="500" />
+        </label>
+        <label>ESP 上报间隔 (ms)
+          <input id="espHallIntervalMs" type="number" min="100" max="60000" value="5000" />
         </label>
       </div>
 
@@ -68,9 +56,15 @@
         <button id="scanOnceBtn" class="ghost">扫描一次</button>
         <button id="startBtn">开始轮询</button>
         <button id="stopBtn" class="ghost">停止轮询</button>
+        <button id="applyEspIntervalBtn" class="ghost">下发 ESP 间隔</button>
       </div>
 
       <p id="statusLine" class="muted"></p>
+
+      <section class="payload-panel payload-left">
+        <h3>ESP32 最新报文</h3>
+        <pre id="payloadText">{}</pre>
+      </section>
     </section>
 
     <section class="card board-card">
@@ -79,7 +73,9 @@
         <div>激活数：<strong id="metaActive">0</strong></div>
         <div>最大值：<strong id="metaMax">0</strong></div>
       </div>
-      <div id="hallGrid" class="hall-grid"></div>
+      <div class="board-main">
+        <div id="hallGrid" class="hall-grid"></div>
+      </div>
     </section>
   </main>
 

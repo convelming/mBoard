@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WebServer.h>
+#include <Wire.h>
 #include <Preferences.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -15,8 +16,8 @@
  * - Hall matrix scan and uplink every 5s or when changed
  *
  * IMPORTANT:
- * 1) This sketch defaults to MOCK hall values (HALL_USE_MOCK=1).
- * 2) Replace readHallValue() with your real hall-array scan code.
+ * 1) This sketch supports real MCP23017 hall scan on dual I2C.
+ * 2) Set HALL_USE_MOCK=1 only for pure simulation.
  */
 
 // BLE UUIDs must match scan/public/scan.html
@@ -38,8 +39,58 @@ static const int HALL_EXTRA_COLS = 0;
 static const int HALL_ROWS = HALL_BOARD_ROWS + HALL_EXTRA_ROWS;
 static const int HALL_COLS = HALL_BOARD_COLS + HALL_EXTRA_COLS;
 static const int HALL_CELLS = HALL_ROWS * HALL_COLS;
-static const int HALL_CHANGE_THRESHOLD = 1; // report immediately if changed more than this
-#define HALL_USE_MOCK 1
+// Binary hall values (0/1): any toggle should trigger changed=true.
+static const int HALL_CHANGE_THRESHOLD = 0;
+static const uint32_t HALL_PUSH_INTERVAL_DEFAULT_MS = 5000;
+static const uint32_t HALL_PUSH_INTERVAL_MIN_MS = 100;
+static const uint32_t HALL_PUSH_INTERVAL_MAX_MS = 60000;
+static const uint32_t HALL_CONFIG_PULL_INTERVAL_MS = 15000;
+#define HALL_USE_MOCK 0
+
+// Dual-I2C wiring from SCH_PAS-SET_SCH_2026-01-14.pdf:
+// IIC1 -> SDA=IO4, SCL=IO5
+// IIC2 -> SDA=IO6, SCL=IO7
+static const int IIC1_SDA_PIN = 4;
+static const int IIC1_SCL_PIN = 5;
+static const int IIC2_SDA_PIN = 6;
+static const int IIC2_SCL_PIN = 7;
+static const uint32_t I2C_FREQ_HZ = 100000;
+
+// MCP23017 address range is 0x20~0x27 per bus.
+// For 10 rows on two buses, default mapping is:
+// row0~5 -> IIC1 addr 0x20~0x25, row6~9 -> IIC2 addr 0x20~0x23.
+// If your hardware differs, edit the two arrays below.
+static const int MCP_DEFAULT_ROWS = 10;
+static const uint8_t MCP_ROW_BUS_DEFAULT[MCP_DEFAULT_ROWS] = {
+  1, 1, 1, 1, 1, 1, 2, 2, 2, 2
+};
+static const uint8_t MCP_ROW_ADDR_DEFAULT[MCP_DEFAULT_ROWS] = {
+  0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x20, 0x21, 0x22, 0x23
+};
+
+bool gHallActiveLow = true;
+// Column-map mode 0 (default): from MCP schematic
+// 11 hall columns wired as GPB0~GPB7 + GPA7~GPA5.
+static const uint8_t HALL_COL_TO_MCP_BIT_MODE0[HALL_BOARD_COLS] = {
+  8, 9, 10, 11, 12, 13, 14, 15, 7, 6, 5
+};
+// Column-map mode 1: compatibility with legacy test numbering
+// (GPA0~GPA7 + GPB5~GPB7)
+static const uint8_t HALL_COL_TO_MCP_BIT_MODE1[HALL_BOARD_COLS] = {
+  0, 1, 2, 3, 4, 5, 6, 7, 13, 14, 15
+};
+static const uint8_t MCP_REG_IODIRA = 0x00;
+static const uint8_t MCP_REG_IODIRB = 0x01;
+static const uint8_t MCP_REG_GPPUA = 0x0C;
+static const uint8_t MCP_REG_GPPUB = 0x0D;
+static const uint8_t MCP_REG_GPIOA = 0x12;
+static const uint8_t MCP_REG_GPIOB = 0x13;
+
+uint8_t gRowBusNo[HALL_ROWS];
+uint8_t gRowAddr[HALL_ROWS];
+bool gRowPresent[HALL_ROWS];
+uint16_t gRowBits[HALL_ROWS];
+int gColMapMode = 0;
 
 Preferences prefs;
 BLECharacteristic* charStatus = nullptr;
@@ -48,14 +99,57 @@ BLECharacteristic* charWifiList = nullptr;
 String gDeviceId;
 String gFwVersion = "A2.0.0";
 String gProductId = "";
-String gBackendUrl = "http://192.168.1.100:8866";
+String gBackendUrl = "http://192.168.1.3:8866";
 String gSoftApSsid = "mTabula-Setup";
 WebServer gProvisionServer(80);
 
 int gLastValues[HALL_CELLS];
 uint32_t gLastHallPushMs = 0;
 uint32_t gLastHeartbeatMs = 0;
+uint32_t gHallPushIntervalMs = HALL_PUSH_INTERVAL_DEFAULT_MS;
+uint32_t gLastHallConfigPullMs = 0;
 bool gWifiReady = false;
+
+String trimTrailingSlash(String text) {
+  text.trim();
+  while (text.endsWith("/")) {
+    text.remove(text.length() - 1);
+  }
+  return text;
+}
+
+bool isValidBackendUrl(const String& backendUrl) {
+  String u = backendUrl;
+  u.trim();
+  if (u.length() == 0) return false;
+
+  String lower = u;
+  lower.toLowerCase();
+  if (!lower.startsWith("http://") && !lower.startsWith("https://")) return false;
+
+  // ESP32 cannot reach backend if it is localhost on itself.
+  if (lower.indexOf("localhost") >= 0 || lower.indexOf("127.0.0.1") >= 0) return false;
+  return true;
+}
+
+uint32_t clampHallPushIntervalMs(uint32_t ms) {
+  if (ms < HALL_PUSH_INTERVAL_MIN_MS) return HALL_PUSH_INTERVAL_MIN_MS;
+  if (ms > HALL_PUSH_INTERVAL_MAX_MS) return HALL_PUSH_INTERVAL_MAX_MS;
+  return ms;
+}
+
+uint32_t parseHallPushIntervalMs(const String& raw, uint32_t fallback) {
+  String text = raw;
+  text.trim();
+  if (text.length() == 0) return fallback;
+  for (int i = 0; i < text.length(); i++) {
+    char ch = text.charAt(i);
+    if (ch < '0' || ch > '9') return fallback;
+  }
+  unsigned long v = text.toInt();
+  if (v == 0) return fallback;
+  return clampHallPushIntervalMs((uint32_t)v);
+}
 
 void sendCors() {
   gProvisionServer.sendHeader("Access-Control-Allow-Origin", "*");
@@ -130,11 +224,17 @@ void printDeviceInfoJson() {
 }
 
 bool connectWiFi(const String& ssid, const String& password, uint32_t timeoutMs = 20000) {
+  Serial.printf("wifi connect start: ssid=%s timeout=%lu\n", ssid.c_str(), (unsigned long)timeoutMs);
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
   uint32_t t0 = millis();
   while (WiFi.status() != WL_CONNECTED && (millis() - t0) < timeoutMs) {
     delay(300);
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.printf("wifi connected: ip=%s\n", WiFi.localIP().toString().c_str());
+  } else {
+    Serial.println("wifi connect failed");
   }
   return WiFi.status() == WL_CONNECTED;
 }
@@ -143,9 +243,14 @@ void loadConfig() {
   prefs.begin("mt_cfg", true);
   gProductId = prefs.getString("product", "");
   gBackendUrl = prefs.getString("backend", gBackendUrl);
+  gHallPushIntervalMs = clampHallPushIntervalMs(prefs.getUInt("hall_ms", HALL_PUSH_INTERVAL_DEFAULT_MS));
   String ssid = prefs.getString("ssid", "");
   String pwd = prefs.getString("pwd", "");
   prefs.end();
+
+  Serial.printf("cfg productId=%s backendUrl=%s hallPushMs=%lu ssid=%s\n",
+                gProductId.c_str(), gBackendUrl.c_str(),
+                (unsigned long)gHallPushIntervalMs, ssid.c_str());
 
   if (ssid.length() > 0) {
     bool ok = connectWiFi(ssid, pwd, 12000);
@@ -156,13 +261,19 @@ void loadConfig() {
   }
 }
 
-void saveProvision(const String& productId, const String& ssid, const String& password, const String& backendUrl) {
+void saveProvision(const String& productId, const String& ssid, const String& password,
+                   const String& backendUrl, const String& hallIntervalMsText) {
+  gHallPushIntervalMs = parseHallPushIntervalMs(hallIntervalMsText, gHallPushIntervalMs);
   prefs.begin("mt_cfg", false);
   prefs.putString("product", productId);
   prefs.putString("ssid", ssid);
   prefs.putString("pwd", password);
-  if (backendUrl.length() > 0) prefs.putString("backend", backendUrl);
+  prefs.putUInt("hall_ms", gHallPushIntervalMs);
+  if (isValidBackendUrl(backendUrl)) {
+    prefs.putString("backend", trimTrailingSlash(backendUrl));
+  }
   prefs.end();
+  Serial.printf("hall push interval set: %lu ms\n", (unsigned long)gHallPushIntervalMs);
 }
 
 void handleProvisionOptions() {
@@ -178,7 +289,7 @@ void handleProvisionHealth() {
 
 void handleProvisionRoot() {
   sendCors();
-  String body = "mTabula SoftAP ready. POST /provision with JSON: {productId,ssid,password,backendUrl}";
+  String body = "mTabula SoftAP ready. POST /provision with JSON: {productId,ssid,password,backendUrl,hallIntervalMs}";
   gProvisionServer.send(200, "text/plain", body);
 }
 
@@ -214,6 +325,7 @@ void handleProvisionPost() {
   String ssid = jsonGet(raw, "ssid");
   String password = jsonGet(raw, "password");
   String backend = jsonGet(raw, "backendUrl");
+  String hallIntervalMs = jsonGet(raw, "hallIntervalMs");
 
   if (productId.length() == 0) {
     sendCors();
@@ -226,9 +338,14 @@ void handleProvisionPost() {
     return;
   }
 
-  saveProvision(productId, ssid, password, backend);
+  saveProvision(productId, ssid, password, backend, hallIntervalMs);
   gProductId = productId;
-  if (backend.length() > 0) gBackendUrl = backend;
+  if (isValidBackendUrl(backend)) {
+    gBackendUrl = trimTrailingSlash(backend);
+    Serial.printf("backendUrl updated: %s\n", gBackendUrl.c_str());
+  } else if (backend.length() > 0) {
+    Serial.printf("ignore invalid backendUrl: %s\n", backend.c_str());
+  }
 
   notifyStatus("connecting", "wifi connecting");
   bool ok = connectWiFi(ssid, password);
@@ -278,31 +395,222 @@ bool postJson(const String& url, const String& body, int* codeOut = nullptr) {
   return code >= 200 && code < 300;
 }
 
+void pullHallConfigFromBackend(bool forcePull = false) {
+  if (!gWifiReady || gProductId.length() == 0) return;
+  uint32_t nowMs = millis();
+  if (!forcePull && (nowMs - gLastHallConfigPullMs) < HALL_CONFIG_PULL_INTERVAL_MS) return;
+  gLastHallConfigPullMs = nowMs;
+
+  String url = gBackendUrl + "/api/boards/" + gProductId + "/hall-config";
+  HTTPClient http;
+  http.begin(url);
+  int code = http.GET();
+  if (code >= 200 && code < 300) {
+    String body = http.getString();
+    String msText = jsonGet(body, "hallIntervalMsText");
+    if (msText.length() > 0) {
+      uint32_t nextMs = parseHallPushIntervalMs(msText, gHallPushIntervalMs);
+      if (nextMs != gHallPushIntervalMs) {
+        gHallPushIntervalMs = nextMs;
+        prefs.begin("mt_cfg", false);
+        prefs.putUInt("hall_ms", gHallPushIntervalMs);
+        prefs.end();
+        Serial.printf("hall push interval pulled from backend: %lu ms\n", (unsigned long)gHallPushIntervalMs);
+      }
+    }
+  } else if (forcePull) {
+    Serial.printf("hall-config pull failed: code=%d url=%s\n", code, url.c_str());
+  }
+  http.end();
+}
+
 void sendHeartbeat() {
   if (!gWifiReady || gProductId.length() == 0) return;
   String url = gBackendUrl + "/api/boards/" + gProductId + "/heartbeat";
   String body = "{\"deviceId\":\"" + gDeviceId +
                 "\",\"fwVersion\":\"" + gFwVersion +
                 "\",\"ip\":\"" + WiFi.localIP().toString() + "\"}";
-  postJson(url, body);
+  int code = 0;
+  bool ok = postJson(url, body, &code);
+  if (!ok) {
+    Serial.printf("heartbeat failed: code=%d url=%s\n", code, url.c_str());
+  }
+}
+
+TwoWire* pickI2cBus(uint8_t busNo) {
+  return (busNo == 1) ? &Wire : &Wire1;
+}
+
+bool mcpWriteReg(TwoWire* bus, uint8_t addr, uint8_t reg, uint8_t value) {
+  if (!bus) return false;
+  bus->beginTransmission(addr);
+  bus->write(reg);
+  bus->write(value);
+  return bus->endTransmission() == 0;
+}
+
+bool mcpReadReg(TwoWire* bus, uint8_t addr, uint8_t reg, uint8_t* out) {
+  if (!bus || !out) return false;
+  bus->beginTransmission(addr);
+  bus->write(reg);
+  if (bus->endTransmission(false) != 0) return false;
+  int n = bus->requestFrom((int)addr, 1);
+  if (n != 1) return false;
+  *out = bus->read();
+  return true;
+}
+
+bool mcpSetupInputs(TwoWire* bus, uint8_t addr) {
+  if (!mcpWriteReg(bus, addr, MCP_REG_IODIRA, 0xFF)) return false;
+  if (!mcpWriteReg(bus, addr, MCP_REG_IODIRB, 0xFF)) return false;
+  // Keep line stable for open-drain style outputs.
+  if (!mcpWriteReg(bus, addr, MCP_REG_GPPUA, 0xFF)) return false;
+  if (!mcpWriteReg(bus, addr, MCP_REG_GPPUB, 0xFF)) return false;
+  return true;
+}
+
+bool mcpReadBits(TwoWire* bus, uint8_t addr, uint16_t* outBits) {
+  if (!outBits) return false;
+  uint8_t a = 0;
+  uint8_t b = 0;
+  if (!mcpReadReg(bus, addr, MCP_REG_GPIOA, &a)) return false;
+  if (!mcpReadReg(bus, addr, MCP_REG_GPIOB, &b)) return false;
+  *outBits = ((uint16_t)b << 8) | a;
+  return true;
+}
+
+void setupHallMappingDefaults() {
+  for (int r = 0; r < HALL_ROWS; r++) {
+    gRowBusNo[r] = 0;
+    gRowAddr[r] = 0;
+    gRowPresent[r] = false;
+    gRowBits[r] = 0;
+  }
+
+  int n = HALL_ROWS < MCP_DEFAULT_ROWS ? HALL_ROWS : MCP_DEFAULT_ROWS;
+  for (int r = 0; r < n; r++) {
+    gRowBusNo[r] = MCP_ROW_BUS_DEFAULT[r];
+    gRowAddr[r] = MCP_ROW_ADDR_DEFAULT[r];
+  }
+}
+
+void printI2cScan(uint8_t busNo) {
+  TwoWire* bus = pickI2cBus(busNo);
+  Serial.printf("iic%u scan:", busNo);
+  bool found = false;
+  for (uint8_t addr = 0x20; addr <= 0x27; addr++) {
+    bus->beginTransmission(addr);
+    uint8_t err = bus->endTransmission();
+    if (err == 0) {
+      Serial.printf(" 0x%02X", addr);
+      found = true;
+    }
+  }
+  if (!found) Serial.print(" (none)");
+  Serial.println();
+}
+
+void setupHallHardware() {
+  setupHallMappingDefaults();
+  Wire.begin(IIC1_SDA_PIN, IIC1_SCL_PIN, I2C_FREQ_HZ);
+  Wire1.begin(IIC2_SDA_PIN, IIC2_SCL_PIN, I2C_FREQ_HZ);
+
+  Serial.printf("hall-i2c setup: iic1(sda=%d,scl=%d) iic2(sda=%d,scl=%d)\n",
+                IIC1_SDA_PIN, IIC1_SCL_PIN, IIC2_SDA_PIN, IIC2_SCL_PIN);
+  Serial.println("note: MCP23017 valid address range is 0x20~0x27 per i2c bus");
+  printI2cScan(1);
+  printI2cScan(2);
+
+  for (int r = 0; r < HALL_ROWS; r++) {
+    uint8_t busNo = gRowBusNo[r];
+    uint8_t addr = gRowAddr[r];
+    if (busNo < 1 || busNo > 2 || addr < 0x20 || addr > 0x27) {
+      Serial.printf("hall row[%d] mapping invalid (bus=%u addr=0x%02X)\n", r, busNo, addr);
+      continue;
+    }
+    TwoWire* bus = pickI2cBus(busNo);
+    bool ok = mcpSetupInputs(bus, addr);
+    gRowPresent[r] = ok;
+    Serial.printf("hall row[%d] -> iic%u addr=0x%02X %s\n",
+                  r, busNo, addr, ok ? "ok" : "missing");
+  }
+}
+
+void refreshHallRows() {
+  for (int r = 0; r < HALL_ROWS; r++) {
+    if (!gRowPresent[r]) {
+      gRowBits[r] = 0;
+      continue;
+    }
+    TwoWire* bus = pickI2cBus(gRowBusNo[r]);
+    uint16_t bits = 0;
+    if (mcpReadBits(bus, gRowAddr[r], &bits)) {
+      gRowBits[r] = bits;
+    } else {
+      gRowBits[r] = 0;
+      gRowPresent[r] = false;
+      Serial.printf("hall row[%d] read failed, mark offline (iic%u 0x%02X)\n",
+                    r, gRowBusNo[r], gRowAddr[r]);
+    }
+  }
+}
+
+void printHallMap() {
+  for (int r = 0; r < HALL_ROWS; r++) {
+    Serial.printf("row[%d] => iic%u 0x%02X %s\n",
+                  r, gRowBusNo[r], gRowAddr[r], gRowPresent[r] ? "online" : "offline");
+  }
+}
+
+void printHallRaw() {
+  refreshHallRows();
+  for (int r = 0; r < HALL_ROWS; r++) {
+    Serial.printf("row[%d] bits=0x%04X\n", r, gRowBits[r]);
+  }
+}
+
+void printHallPolarity() {
+  Serial.printf("hall polarity: active_%s\n", gHallActiveLow ? "low" : "high");
+}
+
+uint8_t mapColToBit(int col) {
+  if (col < 0 || col >= HALL_COLS || col >= 16) return 0xFF;
+  if (col < HALL_BOARD_COLS) {
+    return (gColMapMode == 0) ? HALL_COL_TO_MCP_BIT_MODE0[col] : HALL_COL_TO_MCP_BIT_MODE1[col];
+  }
+  return (uint8_t)col;
+}
+
+void printHallColMap() {
+  Serial.printf("hall col-map mode=%d\n", gColMapMode);
+  String line = "col->bit:";
+  for (int c = 0; c < HALL_BOARD_COLS; c++) {
+    line += " ";
+    line += String(c);
+    line += ">";
+    line += String(mapColToBit(c));
+  }
+  Serial.println(line);
 }
 
 int readHallValue(int row, int col) {
 #if HALL_USE_MOCK
-  // Mock pattern: stable but moving hotspot
+  // Mock pattern: moving binary hotspot
   int t = (millis() / 800) % (HALL_ROWS + HALL_COLS);
   int centerR = t % HALL_ROWS;
   int centerC = (t * 2) % HALL_COLS;
   int dr = abs(row - centerR);
   int dc = abs(col - centerC);
   int d = dr + dc;
-  int v = 120 - d * 35;
-  if (v < 0) v = 0;
-  return v;
+  return (d <= 1) ? 1 : 0;
 #else
-  // TODO: replace with your real hall matrix scan logic
-  // e.g., select row via mux, read columns by ADC/GPIO
-  return 0;
+  if (row < 0 || row >= HALL_ROWS || col < 0 || col >= HALL_COLS || col >= 16) return 0;
+  uint16_t bits = gRowBits[row];
+  uint8_t bitIndex = mapColToBit(col);
+  if (bitIndex >= 16) return 0;
+  bool rawHigh = ((bits >> bitIndex) & 0x01) != 0;
+  bool active = gHallActiveLow ? (!rawHigh) : rawHigh;
+  return active ? 1 : 0;
 #endif
 }
 
@@ -310,6 +618,9 @@ bool scanHall(int* outValues, int* outActive, int* outMax) {
   int active = 0;
   int maxV = 0;
   bool changed = false;
+#if !HALL_USE_MOCK
+  refreshHallRows();
+#endif
   for (int r = 0; r < HALL_ROWS; r++) {
     for (int c = 0; c < HALL_COLS; c++) {
       int idx = r * HALL_COLS + c;
@@ -326,7 +637,13 @@ bool scanHall(int* outValues, int* outActive, int* outMax) {
 }
 
 void pushHallFrame(bool forcePush) {
-  if (!gWifiReady || gProductId.length() == 0) return;
+  if (!gWifiReady || gProductId.length() == 0) {
+    if (forcePush) {
+      Serial.printf("skip hall push: wifiReady=%d productId=%s\n",
+                    gWifiReady ? 1 : 0, gProductId.c_str());
+    }
+    return;
+  }
 
   int values[HALL_CELLS];
   int active = 0;
@@ -334,7 +651,7 @@ void pushHallFrame(bool forcePush) {
   bool changed = scanHall(values, &active, &maxV);
 
   uint32_t nowMs = millis();
-  bool periodic = (nowMs - gLastHallPushMs) >= 5000;
+  bool periodic = (nowMs - gLastHallPushMs) >= gHallPushIntervalMs;
   if (!forcePush && !changed && !periodic) return;
 
   String valuesJson = "[";
@@ -348,7 +665,7 @@ void pushHallFrame(bool forcePush) {
                 "\",\"deviceId\":\"" + gDeviceId +
                 "\",\"rows\":" + String(HALL_ROWS) +
                 ",\"cols\":" + String(HALL_COLS) +
-                ",\"mode\":\"intensity\"" +
+                ",\"mode\":\"binary\"" +
                 ",\"activeCount\":" + String(active) +
                 ",\"maxValue\":" + String(maxV) +
                 ",\"values\":" + valuesJson + "}";
@@ -360,7 +677,7 @@ void pushHallFrame(bool forcePush) {
     for (int i = 0; i < HALL_CELLS; i++) gLastValues[i] = values[i];
     gLastHallPushMs = nowMs;
   } else {
-    Serial.printf("hall-frame post failed: %d\n", code);
+    Serial.printf("hall-frame post failed: %d url=%s\n", code, url.c_str());
   }
 }
 
@@ -373,6 +690,7 @@ class ProvisionCallback : public BLECharacteristicCallbacks {
     String ssid = jsonGet(s, "ssid");
     String password = jsonGet(s, "password");
     String backend = jsonGet(s, "backendUrl");
+    String hallIntervalMs = jsonGet(s, "hallIntervalMs");
 
     if (productId.length() == 0) {
       notifyStatus("failed", "missing productId");
@@ -383,8 +701,13 @@ class ProvisionCallback : public BLECharacteristicCallbacks {
       return;
     }
 
-    saveProvision(productId, ssid, password, backend);
-    if (backend.length() > 0) gBackendUrl = backend;
+    saveProvision(productId, ssid, password, backend, hallIntervalMs);
+    if (isValidBackendUrl(backend)) {
+      gBackendUrl = trimTrailingSlash(backend);
+      Serial.printf("backendUrl updated: %s\n", gBackendUrl.c_str());
+    } else if (backend.length() > 0) {
+      Serial.printf("ignore invalid backendUrl: %s\n", backend.c_str());
+    }
     gProductId = productId;
 
     notifyStatus("connecting", "wifi connecting");
@@ -452,6 +775,7 @@ void setup() {
   gDeviceId = getDeviceId();
   printDeviceInfoJson();
   for (int i = 0; i < HALL_CELLS; i++) gLastValues[i] = -9999;
+  setupHallHardware();
   setupSoftApProvision();
   loadConfig();
   setupBLE();
@@ -464,6 +788,50 @@ void loop() {
     line.toUpperCase();
     if (line == "INFO") {
       printDeviceInfoJson();
+      Serial.printf("cfg productId=%s backendUrl=%s hallPushMs=%lu wifi=%d ip=%s pol=%s colMap=%d\n",
+                    gProductId.c_str(), gBackendUrl.c_str(),
+                    (unsigned long)gHallPushIntervalMs,
+                    gWifiReady ? 1 : 0, WiFi.localIP().toString().c_str(),
+                    gHallActiveLow ? "active_low" : "active_high", gColMapMode);
+      pushHallFrame(true);
+    } else if (line == "I2CSCAN") {
+      printI2cScan(1);
+      printI2cScan(2);
+    } else if (line == "HALLMAP") {
+      printHallMap();
+    } else if (line == "HALLRAW") {
+      printHallRaw();
+    } else if (line == "HALLPOL") {
+      printHallPolarity();
+      printHallColMap();
+    } else if (line == "HALLPOL0") {
+      gHallActiveLow = false;
+      printHallPolarity();
+      pushHallFrame(true);
+    } else if (line == "HALLPOL1") {
+      gHallActiveLow = true;
+      printHallPolarity();
+      pushHallFrame(true);
+    } else if (line == "HALLCOL0") {
+      gColMapMode = 0;
+      printHallColMap();
+      pushHallFrame(true);
+    } else if (line == "HALLCOL1") {
+      gColMapMode = 1;
+      printHallColMap();
+      pushHallFrame(true);
+    } else if (line == "HALLINT") {
+      Serial.printf("hall push interval: %lu ms\n", (unsigned long)gHallPushIntervalMs);
+    } else if (line.startsWith("HALLINT=")) {
+      String v = line.substring(8);
+      uint32_t nextMs = parseHallPushIntervalMs(v, gHallPushIntervalMs);
+      gHallPushIntervalMs = nextMs;
+      prefs.begin("mt_cfg", false);
+      prefs.putUInt("hall_ms", gHallPushIntervalMs);
+      prefs.end();
+      Serial.printf("hall push interval updated: %lu ms\n", (unsigned long)gHallPushIntervalMs);
+    } else if (line == "HALLCFG") {
+      pullHallConfigFromBackend(true);
     }
   }
 
@@ -479,6 +847,8 @@ void loop() {
     sendHeartbeat();
     gLastHeartbeatMs = nowMs;
   }
+
+  pullHallConfigFromBackend(false);
 
   pushHallFrame(false);
   gProvisionServer.handleClient();

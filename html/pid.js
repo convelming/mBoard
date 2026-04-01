@@ -253,6 +253,14 @@
   }
 
   async function readEspFromSerial() {
+    if (!window.isSecureContext) {
+      setStatus(
+        '当前页面不是安全上下文（' + window.location.origin + '）。请使用 HTTPS 或 localhost 打开。',
+        true
+      );
+      return;
+    }
+
     if (!('serial' in navigator)) {
       setStatus('当前浏览器不支持 Web Serial，请用 Chrome/Edge 并在 HTTPS 或 localhost 下打开。', true);
       return;

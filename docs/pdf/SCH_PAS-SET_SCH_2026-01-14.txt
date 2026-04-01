@@ -1,0 +1,323 @@
+                                                  U1
+                                                  TO-263-5
+SW1                                               AP1501S-5.0RG
+MSS12C02LS-BB2.0
+                                                                                   4                                                                                                                          +M5V
+        3                                                                     FB
+                                                                                                                                           +M5V                                       +U3V3
+                                                                                                                    +M5V                                          U2
+4             2                               1                                    6
+                                                   VIN                       TAB
+                                                                                                                                                                                                                     R1
+              1                                                                                                                                               1
+
+
+
+
+                                                                   ON/OFF
+                    +P12V                                                                       L1   33uH                                                         IN                                                 1k
+                                                                                   2                                                                                              5
+
+
+
+
+                                                             GND
+                                                                            VOUT                                                                                            OUT
+
+
+
+
+                                                                                       1
+                      C1      C2      C3                                                                                                                      2
+                                                                                                                                                                  GND
+                      470uF   1uF     100nF                                                                 C4             C6                                                     4
+
+
+                                                         3
+
+
+
+                                                                   5
+                                                                                                                                   C5                                       BYP               C7
+CN1                           C1206   C0603                                                D1               100nF          330uF                              3                                                           LED1
+                                                                                                                                   1uF                            EN                          4.7uF/50V/X7R
+          1                                                                                1N5822           C0603                                                                                                         GL0603UR01
+      1                                                                                                                            C0805                                                      C0805
+          2                                                                                                                                                                                                               LED0603-FD
+
+
+
+
+                                                                                       2
+      2
+                                                                                                                                                  SPX3819M5-L-3-3/TR
+                                                                                                                                                  SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BL
+WJ15EDGVC-3.81-2P
+                                                                                            +U5V                           +U3V3
+
+
+
+
+                         USB1                                  D2                                  R2                              R3
+                                            1   VUSB                                               1k                              1k
+                                  VCC                                          +U5V
+                                            2   UD-
+                                      D-
+                       6                    3   UD+            1N4148W
+                           EH         D+
+                                            4
+                                      ID                                                           LED2                            LED3
+                                            5
+                                 GND                                                               XL-1608PGC-06                   XL-1608PGC-06
+                                                                                                   LED0603-RD_GREEN                LED0603-RD_GREEN
+                         MICRO 4P DIP
+
+
+
+
+                                                           RSTS
+                                                                                                                                                                                                 U3                        ESP32-S3-WROOM-1-N16R2
+                                                        Q1
+                                                                                                                             +U3V3                                                                                                                                                                     41              U4
+                                R4                                                                                                                                                                                                                                                             GND
+                DTR                                     SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR                                                                                                   1                                                                                                          40              ZX-PZ2.0-1-2PZZ
+                                                                                                                                                                                                 GND                                                                                           GND
+                                                                                                                                                                                            2                                                                                                          39          1
+                                R0603                   SS8050-G(RANGE:120-200)                                                                                                                  3V3                                                                                             IO1                    1
+                                                                                                                                                                                 RSTS       3                                                                                                          38          2
+                                10k                                                                                                                                                              EN                                                                                              IO2                    2
+                                                                                                                                                                                 IIC1-SDA   4                                                                                                        37 U0TXD
+                                                                                                                      C8             C9            R5                                            IO4                                                                                           TXD0
+                                                                                                                                                                                 IIC1-SCL   5                                                                                                        36 U0RXD          U5
+                                                                                                                      10uF           100nF         10k                                           IO5                                                                                           RXD0
+                                                                                                                                                                                 IIC2-SDA   6                                                                                                        35            1
+                                                                                                                      C0603          C0603         R0603                                         IO6                                                                                            IO42                    1
+                                                                                                                                                                                 IIC2-SCL   7                                                                                                        34            2
+                                                        Q2                                                                                                                                       IO7                                                                                            IO41                    2
+                                                                                                                                                                                 DTR1       8                                                                                                        33            3
+                                R6                                                                                                                                                               IO15                                                                                           IO40                    3
+                RTS                                     SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR                                                                                        STE1       9                                                                                                        32            4
+                                                                                                                                                                                                 IO16                                                                                           IO39                    4
+                                                                                                                                                                                 DTR0       10                                                                                                       31            5
+                                R0603                   SS8050-G(RANGE:120-200)                                                                    C10                                           IO17                                                                                           IO38                    5
+                                                                                                                                                                                 STE0       11                                                                                                       30
+                                10k                                                                                                                1uF                                           IO18                                                                                           IO37
+                                                                                                                                                                                 PDI        12                                                                                                       29                ZX-PZ2.0-1-5PZZ
+                                                                                                                                                   C0603                                         IO8                                                                                            IO36
+                                                           BOOT                                                                                                              1              13                                                                                                       28
+                                                                                                                                                                         1                       IO19                                                                                           IO35
+                                                                                                                                                                             2              14                                                                                                       27 BOOT
+                                                                                                                                                                         2                       IO20                                                                                            IO0
+                                                                                                                                                                             3
+                                                                                                                                                                         3
+                                                                                                                                                                             4
+                                                                                                                                                                         4
+                                                                                                                                                                             0
+
+
+
+
+                                                                                                                                                                                                            IO46
+
+
+                                                                                                                                                                                                                             IO10
+                                                                                                                                                                                                                                      IO11
+                                                                                                                                                                                                                                               IO12
+                                                                                                                                                                                                                                                        IO13
+                                                                                                                                                                                                                                                                 IO14
+                                                                                                                                                                                                                                                                          IO21
+                                                                                                                                                                                                                                                                                 IO47
+                                                                                                                                                                                                                                                                                        IO48
+                                                                                                                                                                                                                                                                                               IO45
+                                                                                                                                                                                                      IO3
+
+
+                                                                                                                                                                                                                     IO9
+                                                                                                                                                                         0
+        +U3V3
+
+
+
+
+                                                                                                                                                                                                  15
+                                                                                                                                                                                                        16
+                                                                                                                                                                                                               17
+                                                                                                                                                                                                                          18
+                                                                                                                                                                                                                                  19
+                                                                                                                                                                                                                                           20
+                                                                                                                                                                                                                                                    21
+                                                                                                                                                                                                                                                             22
+                                                                                                                                                                                                                                                                      23
+                                                                                                                                                                                                                                                                              24
+                                                                                                                                                                                                                                                                                    25
+                                                                                                                                                                                                                                                                                           26
+                                                               U6                                                                                                  CN2
+                                                                         17
+
+
+
+
+                                                                                                                                             BM04B-SRSS-TB(LF)(SN)
+                                                                          EP
+
+
+
+
+                                                           1                                16
+                                                               VIO                     RI
+
+
+
+
+                                                                                                                                                                                                                   MS10
+                                                                                                                                                                                                                           MS20
+                                                                                                                                                                                                                                    MS30
+                                                                                                                                                                                                                                             MS11
+                                                                                                                                                                                                                                                      MS21
+                                                                                                                                                                                                                                                               MS31
+                                                           2                                15
+
+
+
+
+                                                                                                                                                                                                                                                                        FRC
+                                                               GND                    CTS                                                                                                                                                                                                       R7
+                            VUSB                           3                                14
+C11                                                            VDD5                   DSR                                                                                                                                                                                                       1k
+                                            U0RXD          4                                13     RTS
+1uF                                                            TXD                    RTS                                                           SW2                                                                                                                                         R0603                                         SW3                       SW4
+                 C12                        U0TXD          5                                12     DTR
+C0603                                                          RXD             DTRTNOW                                                         1              2      FRC                                                                                                                                                                 1              2   BOOT   1              2   RSTS
+                 1uF                                       6                                11
+                                                               V3                  DCD
+                 C0603                            UD+      7                                10                                                     ST-1185S                                                                                                                                                                                  ST-1185S                  ST-1185S
+                                                               UD+                ACT#
+                                 C13              UD-      8                                9      VUSB                                                                                                                                                                                         LED4
+                                                               UD-                VBUS                                                                     C14                                                                                                                                                                                      C15                       C16
+                                 100nF                                                                                                                                                                                                                                                          XL-1608PGC-06
+                                                                                                                                                           100nF                                                                                                                                                                                    100nF                     100nF
+                                 C0603                         CH343P                                                                                                                                                                                                                           LED0603-RD_GREEN
+                                                                                                                                                           C0603                                                                                                                                                                                    C0603                     C0603
+
+
+
+
+                                                                R8
+                  U0RXD
+                                                                                 +U3V3
+                                                                1k
+                            LED5           GL0603UB01
+
+                                                                R9
+                  U0TXD
+                                                                                 +U3V3
+                                                                1k
+                            LED6           LTST-C191KSKT
+            +P12V
+                                                                        H1     H2
+
+                                                                         1          1            +P12V
+                                                              MS10                                           CN3              H3
+                                                                         2          2
+                    R10                                       MS20                         20B           1              20B
+                                                                         3          3                         1                1
+                    10k                                       MS30                         20A           2              20A
+                                                                         4          4                         2                2
+                    R0603                                                                  10A           3              10A
+                                                                         5          5                         3                3
+                                                                                           10B           4              10B
+                                                                         6          6                         4                4
+                                         CN4                  STE0
+                                                                         7          7            +U3V3
+                     Q4              1                        DTR0                                           ZX-XH2.54-4PZZ   B-2100S04P-A110
+PDI                                       1                              8          8
+                              D3     2
+                     2N7002               2
+                              SS14                           B-2100S08P-A110   B-2100S08P-A110
+      R13
+      20k                                WJ15EDGVC-3.81-2P
+                                                                        H4     H5
+      R0603
+                                                                         1          1            +P12V
+                                                              MS11                                           CN5              H6
+                                                                         2          2
+                                                              MS21                         21B           1              21B
+                                                                         3          3                         1                1
+                                                              MS31                         21A           2              21A
+                                                                         4          4                         2                2
+                                                                                           11A           3              11A
+                                                                         5          5                         3                3
+                                                                                           11B           4              11B
+                                                                         6          6                         4                4
+                                                              STE1
+                                                                         7          7            +U3V3
+                                                              DTR1                                           ZX-XH2.54-4PZZ   B-2100S04P-A110
+                                                                         8          8
+
+                                                             B-2100S08P-A110   B-2100S08P-A110
+CN6                                                  CN7                                                      CN8
+           1                                                       1                                                     1
+       1                +U3V3                                 1                             +U3V3                    1                +U3V3
+         2 IIC1-SDA                                             2 IIC1-SDA                                               2 IIC2-SDA
+       2                                                      2                                                      2
+         3 IIC1-SCL                                             3 IIC1-SCL                                               3 IIC2-SCL
+       3                                                      3                                                      3
+         4                                                      4                                                        4
+       4                                                      4                                                      4
+         0                                                      0                                                        0
+       0                                                      0                                                      0
+
+BM04B-SRSS-TB(LF)(SN)                                BM04B-SRSS-TB(LF)(SN)                                    BM04B-SRSS-TB(LF)(SN)
+
+
+
+
+CN9                                                  CN10                                                     CN11
+           1                                                       1                                                     1
+       1                +U3V3                                 1                             +U3V3                    1                +U3V3
+           2 IIC1-SDA                                              2 IIC1-SDA                                            2 IIC2-SDA
+       2                                                      2                                                      2
+           3 IIC1-SCL                                              3 IIC1-SCL                                            3 IIC2-SCL
+       3                                                      3                                                      3
+           4                                                       4                                                     4
+       4                                                      4                                                      4
+           0                                                       0                                                     0
+       0                                                      0                                                      0
+
+BM04B-SRSS-TB(LF)(SN)                                BM04B-SRSS-TB(LF)(SN)                                    BM04B-SRSS-TB(LF)(SN)
+
+
+
+
+                                           +U3V3           +U3V3           +U3V3           +U3V3
+CN12                                                                                                          CN13
+           1                                                                                                             1
+       1                +U3V3                                                                                        1                +U3V3
+           2 IIC1-SDA                                                                                                    2 IIC2-SDA
+       2                                           R14             R15             R16             R17               2
+           3 IIC1-SCL                                                                                                    3 IIC2-SCL
+       3                                           10k             10k             10k             10k               3
+           4                                                                                                             4
+       4                                           R0603           R0603           R0603           R0603             4
+           0                                                                                                             0
+       0                        IIC1-SDA                                                           IIC2-SDA          0
+                                IIC1-SCL                                                           IIC2-SCL
+BM04B-SRSS-TB(LF)(SN)                                                                                         BM04B-SRSS-TB(LF)(SN)
+
+
+
+
+CN14                                                 CN15                                                     CN16
+           1                                                       1                                                     1
+       1                +U3V3                                 1                             +U3V3                    1                +U3V3
+           2 IIC1-SDA                                              2 IIC2-SDA                                            2 IIC2-SDA
+       2                                                      2                                                      2
+           3 IIC1-SCL                                              3 IIC2-SCL                                            3 IIC2-SCL
+       3                                                      3                                                      3
+           4                                                       4                                                     4
+       4                                                      4                                                      4
+           0                                                       0                                                     0
+       0                                                      0                                                      0
+
+BM04B-SRSS-TB(LF)(SN)                                BM04B-SRSS-TB(LF)(SN)                                    BM04B-SRSS-TB(LF)(SN)
+

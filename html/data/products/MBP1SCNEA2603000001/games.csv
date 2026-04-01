@@ -1,0 +1,2 @@
+id,timestamp,board_id,type,source,move,fen,state,detail_json
+1,2026-03-26T14:07:21.794Z,MBP1SCNEA2603000001,chess,web,c4,rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1,,"{""from"": ""c2"", ""to"": ""c4""}"
