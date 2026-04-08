@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" width="560" height="560">
+  <rect x="20" y="20" width="520" height="520" fill="#f4f4f4" stroke="#333" stroke-width="2"/>
+
+  <rect x="60" y="272" width="440" height="16" fill="#e68c28"/>
+  <rect x="272" y="60" width="16" height="440" fill="#e68c28"/>
+
+  <rect x="252" y="252" width="56" height="56" fill="#9b9b9b" stroke="#222"/>
+
+  <rect x="82" y="338" width="55" height="40" fill="#cd9191" stroke="#222"/>
+  <rect x="423" y="338" width="55" height="40" fill="#cd9191" stroke="#222"/>
+
+  <g fill="#28be50" stroke="#146b2d" stroke-width="1.5">
+    <circle cx="140" cy="100" r="8"/><circle cx="420" cy="100" r="8"/>
+    <circle cx="140" cy="460" r="8"/><circle cx="420" cy="460" r="8"/>
+    <circle cx="262" cy="240" r="8"/><circle cx="298" cy="240" r="8"/>
+    <circle cx="262" cy="320" r="8"/><circle cx="298" cy="320" r="8"/>
+    <circle cx="60" cy="280" r="8"/><circle cx="500" cy="280" r="8"/>
+  </g>
+
+  <polyline fill="none" stroke="#d22d2d" stroke-width="3"
+    points="138,460 138,100 262,240 252,280 298,320 422,460 422,100 308,280 138,460"/>
+
+  <polyline fill="none" stroke="#2d5fdc" stroke-width="3"
+    points="422,460 422,100 298,240 308,280 262,320 138,460 138,100 252,280 422,460"/>
+
+  <circle cx="252" cy="280" r="3" fill="#111"/>
+  <circle cx="308" cy="280" r="3" fill="#111"/>
+
+  <text x="28" y="34" font-family="Arial, sans-serif" font-size="14" fill="#111">Symmetric CoreXY-like routing demo</text>
+  <text x="28" y="52" font-family="Arial, sans-serif" font-size="12" fill="#333">Red=Belt A, Blue=Belt B, Green=Idlers</text>
+</svg>

@@ -17,17 +17,20 @@
 
 static const uint8_t MOSFET_PIN = 3;
 static const uint8_t STATUS_LED_PIN = LED_BUILTIN;
-static const bool ACTIVE_LOW = true;
+// Most UNO MOSFET modules are "low-side (negative-side) switching",
+// but their control input is typically active-HIGH.
+// If your specific module is low-level trigger, set this to true.
+static const bool ACTIVE_LOW = false;
 static const unsigned long PULSE_MS = 5000;
 
 bool magnetOn = false;
 unsigned long magnetOffAt = 0;
 
 void setMagnet(bool enabled) {
-  const uint8_t pwmValue = enabled
-    ? (ACTIVE_LOW ? 0 : 255)
-    : (ACTIVE_LOW ? 255 : 0);
-  analogWrite(MOSFET_PIN, pwmValue);
+  const uint8_t level = enabled
+    ? (ACTIVE_LOW ? LOW : HIGH)
+    : (ACTIVE_LOW ? HIGH : LOW);
+  digitalWrite(MOSFET_PIN, level);
   digitalWrite(STATUS_LED_PIN, enabled ? HIGH : LOW);
   Serial.println(enabled ? F("Electromagnet: ON") : F("Electromagnet: OFF"));
 }
@@ -41,7 +44,7 @@ void setup() {
   setMagnet(false);
 
   Serial.println(F("uno_mosfet_test ready"));
-  Serial.println(F("mosfet pin = D3 (PWM)"));
+  Serial.println(F("mosfet pin = D3"));
   Serial.println(F("status led = LED_BUILTIN"));
   Serial.print(F("trigger mode = "));
   Serial.println(ACTIVE_LOW ? F("active_low") : F("active_high"));
@@ -57,7 +60,7 @@ void loop() {
       setMagnet(true);
       magnetOn = true;
       magnetOffAt = millis() + PULSE_MS;
-      Serial.println(F("timer started: 500 ms"));
+      Serial.println(F("timer started: 5000 ms"));
     } else if (c == '0') {
       setMagnet(false);
       magnetOn = false;
