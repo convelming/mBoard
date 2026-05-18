@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="mTalular knight wrench logo">
+  <defs>
+    <style>
+      .ink { fill: #111111; }
+      .line { fill: none; stroke: #111111; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; }
+      .txt { font-family: 'Trebuchet MS', 'Avenir Next', 'PingFang SC', sans-serif; fill: #111111; }
+      .sub { font-size: 26px; letter-spacing: 3px; }
+    </style>
+  </defs>
+
+  <!-- badge -->
+  <g transform="translate(40,32)">
+    <rect x="0" y="0" width="360" height="360" rx="52" class="ink"/>
+
+    <!-- knight silhouette body -->
+    <path fill="#ffffff" d="M90 286
+      C92 242, 110 214, 142 196
+      C126 172, 124 145, 138 124
+      C152 101, 178 86, 206 88
+      C242 90, 268 113, 278 146
+      C281 156, 281 167, 278 176
+      C266 171, 253 170, 242 174
+      C226 179, 214 192, 206 208
+      C194 231, 170 248, 146 258
+      C134 263, 126 273, 124 286 Z"/>
+
+    <!-- wrench gag: open wrench head as mane cutout -->
+    <g transform="translate(165,126) rotate(-26)">
+      <path class="ink" d="M0 0
+        C20 -8, 44 -6, 61 8
+        C43 12, 29 26, 25 45
+        C20 66, 30 86, 47 97
+        C28 102, 9 96, -4 82
+        C-25 60, -29 26, -11 2
+        Z"/>
+      <circle cx="38" cy="55" r="9" fill="#ffffff"/>
+      <rect x="33" y="58" width="10" height="34" rx="5" fill="#ffffff"/>
+    </g>
+
+    <!-- eye -->
+    <circle cx="222" cy="150" r="7" class="ink"/>
+
+    <!-- smile line for humor -->
+    <path d="M196 188 Q220 201 244 188" class="line" stroke="#111111" style="stroke-width:8"/>
+
+    <!-- base -->
+    <rect x="70" y="286" width="220" height="24" rx="10" fill="#ffffff"/>
+    <rect x="56" y="310" width="248" height="30" rx="12" fill="#ffffff"/>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(450,115)">
+    <text class="txt" x="0" y="130" font-size="138" font-weight="800" letter-spacing="1">mTalular</text>
+    <path d="M4 160 H542" class="line" style="stroke-width:7"/>
+    <text class="txt sub" x="2" y="206">KNIGHTED BY A WRENCH</text>
+  </g>
+</svg>
